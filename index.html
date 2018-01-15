@@ -25,10 +25,13 @@
 
   <script>
     
-    let url = "https://io.adafruit.com/api/v2/brandonsclayton/feeds/temperature.temperature/data"
-    $.ajax({url: url}).done(function(return){
-      console.log("Hello");
-      console.log(return);
+    let url = "https://io.adafruit.com/api/v2/brandonsclayton/feeds/temperature.temperature/data";
+    $.ajax({
+      url: url,
+      success: function(result){
+        console.log("Hello");
+        console.log(result);
+      }
     });
 
   </script>
