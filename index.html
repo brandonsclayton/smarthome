@@ -20,6 +20,21 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+
+  <script>
+    
+    let id = dt94cd81097d7f48b3a208a014ca5c1db7;
+    let url = "https://api.artik.cloud/v1.1/messages/last?count=1&sdids="+id;
+    //let header = {"Authorization": "bearer <YOUR ACCESS TOKEN>"};
+
+    $.ajax({url: url}).done(function(return){
+      console.log("Hello");
+      console.log(return);
+    });
+
+  </script>
 </body>
 
 </html>
