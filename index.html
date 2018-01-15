@@ -25,10 +25,7 @@
 
   <script>
     
-    let id = dt94cd81097d7f48b3a208a014ca5c1db7;
-    let url = "https://api.artik.cloud/v1.1/messages/last?count=1&sdids="+id;
-    //let header = {"Authorization": "bearer <YOUR ACCESS TOKEN>"};
-
+    let url = "https://io.adafruit.com/api/v2/brandonsclayton/feeds/temperature.temperature/data"
     $.ajax({url: url}).done(function(return){
       console.log("Hello");
       console.log(return);
