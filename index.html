@@ -25,14 +25,18 @@
 
   <script>
     
-    let url = "https://io.adafruit.com/api/v2/brandonsclayton/feeds/temperature.temperature/data";
+    
+    let url = "https://io.adafruit.com/api/v2/brandonsclayton/feeds/average-temperature/data"
+    let aio = "3e6def1ef84a4ab2a46968bbf09c150a";
     $.ajax({
       url: url,
+      headers: {"X-AIO-Key" : aio},
       success: function(result){
         console.log("Hello");
         console.log(result);
       }
     });
+
 
   </script>
 </body>
