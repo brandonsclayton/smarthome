@@ -14,6 +14,8 @@ class ArtikCloud{
     _this.apiUrl = "https://api.artik.cloud/v1.1/"
     
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
+  
+    new ArtikCloudAuth().getAccessToken();
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 
@@ -26,7 +28,7 @@ class ArtikCloud{
     $.ajax({
       type: "GET",
       url: _this.apiUrl + "messages/last",
-      headers: { "Authorization": "Bearer " +_this.token},
+      headers: { "Authorization": "Bearer " + _this.token},
       data: { 
           "sdids": device.did,
           "count": count

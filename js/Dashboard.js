@@ -11,7 +11,6 @@ class Dashboard{
 
     _this.devices = new Devices();
     _this.artikCloud = new ArtikCloud();
-   
     
     _this.el = document.querySelector("#content");;
 
@@ -44,13 +43,13 @@ class Dashboard{
     panelsD3.append("div")
         .attr("class", "panel-footer");
 
+    /*
     _this.artikCloud.getLastMessage(
         _this,
         _this.devices.arduinoTemperature,
         1,
         Dashboard.setTemperaturePanel);
 
-    /*
     _this.artikCloud.getLiveMessage(
         _this,
         _this.devices.arduinoTemperature,
