@@ -1,7 +1,7 @@
 
 
 
-class Temperature{
+class Dashboard{
 
 
   //.......................... Constructor: Temperature ........................
@@ -48,7 +48,14 @@ class Temperature{
         _this,
         _this.devices.arduinoTemperature,
         1,
-        Temperature.setTemperaturePanel);
+        Dashboard.setTemperaturePanel);
+
+    /*
+    _this.artikCloud.getLiveMessage(
+        _this,
+        _this.devices.arduinoTemperature,
+        );
+    */
 
     
     _this.avgTempEl = _this.el.querySelector("#avg-temp");

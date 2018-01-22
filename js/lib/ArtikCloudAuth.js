@@ -5,11 +5,12 @@ class ArtikCloudAuth{
   constructor(){
 
     let _this = this;
+    _this.loginEl = document.querySelector("#login-panel");
 
     _this.authUrl = "https://accounts.artik.cloud";
     _this.clientId = "cbdf047c17a14002830333c0906f1bba";
     _this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
-    _this.redirectUrl = "file:///WORK/github/myGithub/smarthome/index.html";
+    _this.redirectUrl = "";
     
     let url = _this.authUrl + 
         "/authorize" +
@@ -19,10 +20,15 @@ class ArtikCloudAuth{
         "&account_type=GOOGLE" +
         "&redirect_uri=" + _this.redirectUrl;
 
-    window.location = url;
-        
     
-    /*
+    _this.loginEl.onclick = function(){
+      window.location = url;
+    };  
+  }
+
+
+  getAccessToken(code){
+
     $.ajax({
       type: "POST",
       url: _this.authUrl + "/token",
@@ -32,12 +38,12 @@ class ArtikCloudAuth{
       },
       data : {
           "grant_type": "client_credentials",
+          "code": code
           },
       sucess: function(response){
           console.log(response);
         }
       });
-    */    
   }
 
 }

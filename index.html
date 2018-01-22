@@ -13,6 +13,11 @@
       width: 100%;
       height: 100%;
     }
+
+    #login-panel{
+      cursor: pointer;
+    }
+  
   </style>
 </head>
 
@@ -20,12 +25,21 @@
 <body>
 
   <div id="content">
+  
+    <div class="col-sm-6">
+      <div class="panel panel-default" id="login-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title"> The Clayton Smart Home </h3>
+        </div>
+      </div>
+    </div>
+  
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="js/ArtikCloudAuth.js" charset="UTF-8"></script>
+  <script src="js/lib/ArtikCloudAuth.js" charset="UTF-8"></script>
  
   <script>
     let auth = new ArtikCloudAuth();
