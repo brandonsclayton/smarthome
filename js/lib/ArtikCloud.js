@@ -15,7 +15,8 @@ class ArtikCloud{
     
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
   
-    new ArtikCloudAuth().getAccessToken();
+    let ac = new ArtikCloudAuth();
+    ac.getAccessToken();
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 
@@ -62,6 +63,29 @@ class ArtikCloud{
     
   }
   //-------------------- End Method: getLastMessage ----------------------------
+
+
+  postMessage(classInfo, device, data, callback){
+    let _this = this;
+    $.ajax({
+      type: "POST",
+      url: _this.apiUrl + "messages",
+      headers: { "Authorization": "Bearer " + _this.token},
+      data: JSON.stringify({ 
+          "sdid": device.did,
+          "data": data
+      }),
+      success: function(response){
+        console.log("Test");
+        console.log(response);
+      },
+      error: function(error){
+        console.log("Error");
+      }
+    });
+
+
+  }
 
 
 
