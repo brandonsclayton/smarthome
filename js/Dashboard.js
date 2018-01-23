@@ -43,20 +43,20 @@ class Dashboard{
     panelsD3.append("div")
         .attr("class", "panel-footer");
 
-    /*
     _this.artikCloud.getLastMessage(
         _this,
         _this.devices.arduinoTemperature,
         1,
         Dashboard.setTemperaturePanel);
 
+    /*
     _this.artikCloud.getLiveMessage(
         _this,
         _this.devices.arduinoTemperature,
         );
     */
 
-    
+
     _this.avgTempEl = _this.el.querySelector("#avg-temp");
     _this.bedroomTempEl = _this.el.querySelector("#bedroom-temp");
     _this.livingTempEl = _this.el.querySelector("#living-temp");

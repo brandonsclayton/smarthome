@@ -50,20 +50,18 @@ class ArtikCloudAuth{
         code = value;
       }
     });
-    
-    console.log(_this.clientId);
-    console.log(_this.clientSecret);
+   
+
     $.ajax({
       type: "POST",
       url: _this.authUrl + "/token",
       headers: { 
-          "Authorization": "Basic " + _this.clientId + _this.clientSecret,
-          "Content-Type": "application/x-www-form-urlencoded"
+          "Authorization": "Basic " + _this.clientId + _this.clientSecret
       },
-      form : {
+      data : JSON.stringify({
           "grant_type": "authorization_code",
           "code": code
-      },
+      }),
       sucess: function(response){
           console.log(response);
         }
