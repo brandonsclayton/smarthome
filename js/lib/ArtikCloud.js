@@ -10,38 +10,33 @@ class ArtikCloud{
     
     let _this = this;
 
-    _this.token = "2ad27f069c3c411a9ef84f6ca2f83b8b";
-    _this.apiUrl = "https://api.artik.cloud/v1.1/"
+    _this.apiUrl = "https://api.artik.cloud/v1.1"
     
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
   
     let ac = new ArtikCloudAuth();
-    ac.getAccessToken();
+    _this.token = ac.getAccessToken();
+  
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 
 
 
   //...................... Method: getLastMessage ..............................
-  getLastMessage(classInfo, device, count, callback){
+  getLastMessage(classInfo, deviceIds, count, callback){
     let _this = this;
 
-    $.ajax({
-      type: "GET",
-      url: _this.apiUrl + "messages/last",
-      headers: { "Authorization": "Bearer " + _this.token},
-      data: { 
-          "sdids": device.did,
-          "count": count
-      },
-      success: function(response){
-          callback(classInfo, response);
-      },
-      error: function(error){
-        console.log("Error");
-      }
-    });
+    let type = "GET";
+    let headerParams = { "Authorization": "Bearer " + _this.token};
+    let queryParams = {
+        "sdids": deviceIds,
+        "count": count
+    };
+    let url = _this.apiUrl + "/messages/last";
 
+    Request.request(classInfo, url, type, 
+        queryParams, headerParams, callback);   
+    
   }
   //-------------------- End Method: getLastMessage ----------------------------
   
@@ -65,27 +60,24 @@ class ArtikCloud{
   //-------------------- End Method: getLastMessage ----------------------------
 
 
-  postMessage(classInfo, device, data, callback){
+  //.................... Method: postMessage ...................................
+  postMessage(classInfo, deviceId, data, callback){
     let _this = this;
-    $.ajax({
-      type: "POST",
-      url: _this.apiUrl + "messages",
-      headers: { "Authorization": "Bearer " + _this.token},
-      data: JSON.stringify({ 
-          "sdid": device.did,
+    let type = "POST";
+    let url =_this.apiUrl + "/messages";
+    let headerParams = { "Authorization": "Bearer " + _this.token};
+    let queryParams = JSON.stringify({ 
+          "sdid": deviceId,
           "data": data
-      }),
-      success: function(response){
-        console.log("Test");
-        console.log(response);
-      },
-      error: function(error){
-        console.log("Error");
-      }
-    });
-
-
+      });
+    
+    Request.request(classInfo, url, type, 
+        queryParams, headerParams, callback);
   }
+  //-------------------- End Method: postMessage -------------------------------
+
+
+  
 
 
 

@@ -17,6 +17,8 @@ class ArtikCloudAuth{
   //---------------------------- End Constructor -------------------------------
 
 
+
+  //............................. Method: login ................................
   login(){
     let _this = this;
     _this.loginEl = document.querySelector("#login-panel");
@@ -24,7 +26,7 @@ class ArtikCloudAuth{
         "/authorize" +
         "?prompt=login" +
         "&client_id=" + _this.clientId +
-        "&response_type=code" +
+        "&response_type=token" +
         "&account_type=GOOGLE" +
         "&redirect_uri=" + _this.redirectUrl;
     
@@ -32,13 +34,28 @@ class ArtikCloudAuth{
       window.location = url;
     };  
   }
-  
+  //------------------------- End Method: login --------------------------------
+
+
+
+  //............................. Method: checkToken ........................... 
+  static checkToken(){
+    
+    let token = localStorage.getItem("token");
+    return token;
+  }
+  //--------------------------- End Method: checkToken -------------------------
+
+
 
   //........................... Method: getAccesToken ..........................
   getAccessToken(){
     let _this = this;
-
-    let url = window.location.search.split("?")[1];
+    
+    let tokenCheck = ArtikCloudAuth.checkToken();
+    if (tokenCheck != null) return tokenCheck;
+    
+    let url = window.location.hash.substring(1);
     let pars = url.split("&");
     let key, 
         code,
@@ -46,26 +63,13 @@ class ArtikCloudAuth{
     pars.forEach(function(par,i){
       key = par.split("=")[0];
       value = par.split("=")[1];
-      if (key == "code"){
-        code = value;
+      if (key == "access_token"){
+        _this.token = value;
+        localStorage.setItem("token", _this.token); 
+        return value;
       }
     });
-   
-
-    $.ajax({
-      type: "POST",
-      url: _this.authUrl + "/token",
-      headers: { 
-          "Authorization": "Basic " + _this.clientId + _this.clientSecret
-      },
-      data : JSON.stringify({
-          "grant_type": "authorization_code",
-          "code": code
-      }),
-      sucess: function(response){
-          console.log(response);
-        }
-      });
+    
   }
   //--------------------- End Method: getAccessToken ---------------------------
 
