@@ -8,10 +8,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8"> 
 
+  <link rel="stylesheet" href="/smarthome/css/Header.css"/>
+  <link rel="stylesheet" href="/smarthome/css/Footer.css"/>
+
   <style>
     #content{
+      display: grid;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: 1.75em 0 2.25em 0;
+      padding: 20px;
+    }
+
+    #dash{
+      margin: auto;
       width: 100%;
-      height: 100%;
+    }
+
+    .panel-body{
+      height: 10em;
     }
   </style>
 </head>
@@ -20,37 +38,40 @@
 <body>
 
   <div id="content">
-    
-    <div class="col-md-offset-1 col-md-4 col-md-offset-1">
-      <div class="panel panel-default" id="temperature-status">
-        <div class="panel-heading">
-          <h3 class="panel-title"> Temperature </h3>
+    <div id="dash"> 
+      <div class="col-md-offset-1 col-md-4">
+        <div class="panel panel-default hidden" id="temperature-status">
+          <div class="panel-heading">
+            <h3 class="panel-title"> Temperature </h3>
+          </div>
+          <div class="panel-body">
+            <div class="temp" id="average-temp"></div>
+            <div class="temp" id="living-room-temp"></div>
+            <div class="temp" id="bedroom-temp"></div>
+          </div>
+          <div class="panel-footer"></div>
         </div>
-        <div class="panel-body">
-          <div class="temp" id="average-temp"></div>
-          <div class="temp" id="living-room-temp"></div>
-          <div class="temp" id="bedroom-temp"></div>
-        </div>
-        <div class="panel-footer"></div>
       </div>
-    </div>
 
-    <div class="col-md-offset-1 col-md-4 col-md-offset-1">
-      <div class="panel panel-default" id="ac-status">
-        <div class="panel-heading">
-          <h3 class="panel-title"> AC Status </h3>
+      <div class="col-md-offset-2 col-md-4">
+        <div class="panel panel-default hidden" id="ac-status">
+          <div class="panel-heading">
+            <h3 class="panel-title"> AC Status </h3>
+          </div>
+          <div class="panel-body">
+          </div>
+          <div class="panel-footer"></div>
         </div>
-        <div class="panel-body">
-        </div>
-        <div class="panel-footer"></div>
       </div>
-    </div>
 
+    </div>
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="js/lib/Header.js" charset="UTF-8"></script>
+  <script src="js/lib/Footer.js" charset="UTF-8"></script>
   <script src="js/lib/Request.js" charset="UTF-8"></script>
   <script src="js/lib/ArtikCloudAuth.js" charset="UTF-8"></script>
   <script src="js/lib/ArtikCloud.js" charset="UTF-8"></script>

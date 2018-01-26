@@ -9,6 +9,11 @@ class Dashboard{
 
     let _this = this; 
 
+    _this.footer = new Footer();
+
+    _this.header = new Header();
+    _this.header.setTitle("Dashboard");
+
     _this.devices = new Devices();
     _this.artikCloud = new ArtikCloud();
     
@@ -68,6 +73,7 @@ class Dashboard{
 
 
     d3.select(_this.acStatusEl)
+        .classed("hidden", false)
         .select(".panel-body")
         .text(state)
     
@@ -96,6 +102,7 @@ class Dashboard{
     ];
 
     d3.select(_this.tempStatusEl)
+        .classed("hidden", false)
         .selectAll(".temp")
         .select(function(d,i){return temp[i][0];})
         .text(function(d,i){return temp[i][1] + "℉ "});
