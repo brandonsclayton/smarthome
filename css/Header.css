@@ -1,0 +1,42 @@
+
+
+
+
+.Header{
+  background: #3F51B5;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1.75em;
+  line-height: 1.75em;
+  box-sizing: border-box;
+  box-shadow: 0px 0px 3px 2px #999;
+  font-size: 1.25em;
+}
+
+.Header .dropdown{
+  height: 100%;
+  padding-left: 1em;
+}
+
+.Header .glyphicon-menu-hamburger{
+  font-size: 1.0em;
+  color: white;
+  line-height: 1.75em;
+}
+
+.Header .glyphicon-menu-hamburger:hover{
+  cursor: pointer;
+}
+
+.Header .dropdown-menu{
+  background: white;
+}
+
+.Header .header-title{
+  color: white;
+  padding-left: 1em;
+}
