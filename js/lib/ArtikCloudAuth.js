@@ -1,4 +1,4 @@
-
+"use strict"
 
 class ArtikCloudAuth{
 
@@ -19,9 +19,8 @@ class ArtikCloudAuth{
 
 
   //............................. Method: login ................................
-  login(){
-    let _this = this;
-    _this.loginEl = document.querySelector("#login-panel");
+  static login(_this){
+    
     let url = _this.authUrl + 
         "/authorize" +
         "?prompt=login" +
@@ -30,32 +29,45 @@ class ArtikCloudAuth{
         "&account_type=GOOGLE" +
         "&redirect_uri=" + _this.redirectUrl;
     
-    _this.loginEl.onclick = function(){
-      window.location = url;
-    };  
+    window.location = url;
   }
   //------------------------- End Method: login --------------------------------
 
 
 
   //............................. Method: checkToken ........................... 
-  static checkToken(){
-    
+  checkToken(){
+    let _this = this; 
     let token = localStorage.getItem("token");
-    return token;
+    let tokenExpiresOn = parseFloat(localStorage.getItem("expiresOn"));
+
+    let dateCheck = new Date().getTime();
+    let oneDay = 1*24*60*60*1000;
+    
+    let url = window.location.hash.substring(1);
+    let includesToken = url.includes("access_token"); 
+    
+    if( (token == null || isNaN(tokenExpiresOn)) && includesToken){
+      console.log("Getting token from URL");
+      ArtikCloudAuth.getAccessToken(_this, url);
+    }
+    else if (tokenExpiresOn - oneDay > dateCheck){
+      console.log("Getting token from local storage");
+      _this.token = token;
+      _this.tokenExipresOn = tokenExpiresOn;
+    }else{
+      console.log("Getting new token");
+      ArtikCloudAuth.newToken(_this);
+    }
+  
   }
   //--------------------------- End Method: checkToken -------------------------
 
 
 
   //........................... Method: getAccesToken ..........................
-  getAccessToken(){
-    let _this = this;
+  static getAccessToken(_this, url){
     
-    let tokenCheck = ArtikCloudAuth.checkToken();
-    if (tokenCheck != null) return tokenCheck;
-    
-    let url = window.location.hash.substring(1);
     let pars = url.split("&");
     let key, 
         code,
@@ -65,15 +77,63 @@ class ArtikCloudAuth{
       value = par.split("=")[1];
       if (key == "access_token"){
         _this.token = value;
-        localStorage.setItem("token", _this.token); 
-        return value;
+      }else if (key == "expires_in"){
+        let ts = new Date().getTime() + value * 1000;
+        _this.expiresOn = ts;
       }
     });
     
+    ArtikCloudAuth.setToken(_this);
   }
   //--------------------- End Method: getAccessToken ---------------------------
 
 
+  //......................... Method: setToken .................................
+  static setToken(_this){
+    localStorage.setItem("token", _this.token);
+    localStorage.setItem("expiresOn", _this.expiresOn);
+  }
+  //------------------------ Method: setToken ----------------------------------
+
+
+
+  //....................... Method: newToken ...................................
+  static newToken(_this){
+    
+    let modalD3 = d3.select("body")
+        .append("div")
+        .attr("class", "modal fade")
+        .attr("id", "login-dialog")
+        .attr("role", "dialog")
+        .style("cursor", "pointer");
+
+    let contentD3 = modalD3.append("div")
+        .attr("class", "modal-dialog modal-md")
+        .append("div")
+        .attr("class", "modal-content");
+  
+    let headerD3 = contentD3.append("div")
+        .attr("class", "modal-header");
+    headerD3.append("h4")
+        .attr("class", "modal-title")
+        .text("The Clayton Smarthome");
+   
+    let footerD3 = contentD3.append("div")
+        .attr("class", "modal-footer");
+    let loginD3 = footerD3.append("button")
+        .attr("class", "btn btn-primary")
+        .attr("type", "button")
+        .text("Login in with Google");
+
+    modalD3.lower();
+    $(modalD3.node()).modal("show");
+    
+    modalD3.on("click", function(){
+      ArtikCloudAuth.login(_this);
+    });
+
+  }
+  //----------------------- End Method: newToken -------------------------------
 
 }
 //----------------------- End Class: ArtikCloudAuth ----------------------------

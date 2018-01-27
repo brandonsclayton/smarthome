@@ -18,7 +18,7 @@ class Footer{
     footerD3.lower();
 
     _this.footerEl = footerD3.node();
-    _this.settingEl = _this.footerEl.querSelector(".settings");
+    _this.settingEl = _this.footerEl.querySelector(".settings");
 
   }
 
