@@ -11,7 +11,7 @@ class ArtikCloudAuth{
     _this.authUrl = "https://accounts.artik.cloud";
     _this.clientId = "cbdf047c17a14002830333c0906f1bba";
     _this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
-    _this.redirectUrl = "http://localhost:8080/smarthome/main.html";
+    _this.redirectUrl = "http://localhost:8080/smarthome/";
     
   }
   //---------------------------- End Constructor -------------------------------
@@ -102,33 +102,45 @@ class ArtikCloudAuth{
     
     let modalD3 = d3.select("body")
         .append("div")
-        .attr("class", "modal fade")
+        .attr("class", "modal fade Login")
         .attr("id", "login-dialog")
-        .attr("role", "dialog")
-        .style("cursor", "pointer");
+        .attr("role", "dialog");
 
     let contentD3 = modalD3.append("div")
-        .attr("class", "modal-dialog modal-md")
+        .attr("class", "modal-dialog modal-sm")
         .append("div")
         .attr("class", "modal-content");
   
     let headerD3 = contentD3.append("div")
         .attr("class", "modal-header");
-    headerD3.append("h4")
-        .attr("class", "modal-title")
+    let titleD3 = headerD3.append("h4")
+        .attr("class", "modal-title");
+
+    titleD3.append("span")
+        .attr("class", "glyphicon glyphicon-home");
+    titleD3.append("span")
         .text("The Clayton Smarthome");
+    titleD3.append("span")
+        .attr("class", "glyphicon glyphicon-home");
    
-    let footerD3 = contentD3.append("div")
-        .attr("class", "modal-footer");
-    let loginD3 = footerD3.append("button")
+    let bodyD3 = contentD3.append("div")
+        .attr("class", "modal-body");
+    let loginD3 = bodyD3.append("button")
         .attr("class", "btn btn-primary")
         .attr("type", "button")
         .text("Login in with Google");
 
     modalD3.lower();
-    $(modalD3.node()).modal("show");
-    
+    $(modalD3.node()).modal({
+        show: true,
+        keyboard: false,
+        backdrop: "static"
+    });
+     
     modalD3.on("click", function(){
+    });
+    
+    contentD3.on("click", function(){
       ArtikCloudAuth.login(_this);
     });
 

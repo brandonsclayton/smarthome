@@ -71,7 +71,6 @@ class Dashboard{
     
     let state = data.state.toUpperCase(); 
 
-
     d3.select(_this.acStatusEl)
         .classed("hidden", false)
         .select(".panel-body")
