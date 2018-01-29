@@ -43,17 +43,18 @@ class ArtikCloud{
 
 
   //...................... Method: getLiveMessage ..............................
-  getLiveMessage(classInfo, device, callback){
+  getLiveMessage(classInfo, deviceIds, callback){
     let _this = this;
 
     let url = _this.wssUrl + "/live" +
-        "?sdids=" + device.did +
+        "?sdids=" + deviceIds +
         "&Authorization=Bearer " + _this.token;
     let webSocket = new WebSocket(url);
     
     webSocket.onmessage = function(event){
       console.log("Message");
       console.log(event);
+      //callback(classInfo, event);
     }
     
   }

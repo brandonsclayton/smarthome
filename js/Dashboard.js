@@ -40,6 +40,12 @@ class Dashboard{
         1,
         Dashboard.setACPanel);
     
+    
+    _this.artikCloud.getLiveMessage(
+        _this,
+        _this.devices.arduinoTemperature.did,
+        Dashboard.setTemperaturePanel);
+    
     /*
     _this.artikCloud.getLastMessage(
         _this,
