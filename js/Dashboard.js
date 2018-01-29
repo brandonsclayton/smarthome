@@ -23,6 +23,8 @@ class Dashboard{
     _this.livingRoomTempEl = _this.el.querySelector("#living-room-temp");
     _this.bedroomTempEl = _this.el.querySelector("#bedroom-temp");
     _this.acStatusEl = _this.el.querySelector("#ac-status");
+    _this.acPanelBody = _this.acStatusEl.querySelector(".panel-body");
+    _this.tempOuterEl = _this.tempStatusEl.querySelector(".outer-panel");
 
 
     _this.artikCloud.getLastMessage(
@@ -39,6 +41,13 @@ class Dashboard{
         Dashboard.setACPanel);
     
     /*
+    _this.artikCloud.getLastMessage(
+        _this,
+        _this.devices.harmonyAC.did + "," 
+            + _this.devices.arduinoTemperature.did,
+        1,
+        Dashboard.setPanels);
+    
     _this.artikCloud.getLiveMessage(
         _this,
         _this.devices.arduinoTemperature,
@@ -62,13 +71,12 @@ class Dashboard{
 
   //..................... Method: setTemperaturePanel ..........................
   static setACPanel(_this, response){
-    console.log(response);
     let metadata = response.data[0];
     let data = metadata.data;
     let ts = metadata.ts;
  
-    let date = new Date(ts).toLocaleString();
-    
+    let date = new Date(ts).toLocaleDateString();
+    let time = new Date(ts).toLocaleTimeString();
     let state = data.state.toUpperCase(); 
 
     d3.select(_this.acStatusEl)
@@ -78,8 +86,8 @@ class Dashboard{
     
     d3.select(_this.acStatusEl)
         .select(".panel-footer")
-        .text(date);
-    
+        .text("Last Updated: " + time + " on " + date);
+
   }
   //------------------- End Method: setTemperaturePanel ------------------------
   
@@ -92,7 +100,8 @@ class Dashboard{
     let data = metadata.data;
     let ts = metadata.ts;
  
-    let date = new Date(ts).toLocaleString();
+    let date = new Date(ts).toLocaleDateString();
+    let time = new Date(ts).toLocaleTimeString();
    
     let temp = [
         [_this.avgTempEl, data.Average_Temperature],
@@ -104,12 +113,17 @@ class Dashboard{
         .classed("hidden", false)
         .selectAll(".temp")
         .select(function(d,i){return temp[i][0];})
-        .text(function(d,i){return temp[i][1] + "℉ "});
+        .html(function(d,i){
+          return temp[i][1] + "℉ "; 
+        });
     
     d3.select(_this.tempStatusEl)
         .select(".panel-footer")
-        .text(date);
+        .text("Last Updated: " + time + " on " + date);
     
+    let height = _this.tempOuterEl.clientHeight;
+    d3.select(_this.acPanelBody)
+        .style("height", height + "px");
   }
   //------------------- End Method: setTemperaturePanel ------------------------
 
