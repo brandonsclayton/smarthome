@@ -16,10 +16,7 @@ class Dashboard{
 
     _this.devices = new Devices();
     _this.artikCloud = new ArtikCloud();
-   
-     let ac = new ArtikCloudAuth();
-    ac.checkToken(_this, Dashboard.getData);
-
+    
     _this.el = document.querySelector("#content");;
     _this.tempStatusEl = _this.el.querySelector("#temperature-status");
     _this.avgTempEl = _this.el.querySelector("#average-temp");
@@ -30,6 +27,18 @@ class Dashboard{
     _this.tempOuterEl = _this.tempStatusEl.querySelector(".outer-panel");
 
 
+    _this.artikCloud.getLastMessage(
+        _this,
+        _this.devices.arduinoTemperature.did,
+        1,
+        Dashboard.setTemperaturePanel);
+
+    
+    _this.artikCloud.getLastMessage(
+        _this,
+        _this.devices.harmonyAC.did,
+        1,
+        Dashboard.setACPanel);
     
     /*
     _this.artikCloud.getLastMessage(
@@ -58,21 +67,7 @@ class Dashboard{
   }
   //--------------------- End Constructor: Temperature -------------------------
 
-  static getData(_this){
-    
-    _this.artikCloud.getLastMessage(
-        _this,
-        _this.devices.arduinoTemperature.did,
-        1,
-        Dashboard.setTemperaturePanel);
 
-    
-    _this.artikCloud.getLastMessage(
-        _this,
-        _this.devices.harmonyAC.did,
-        1,
-        Dashboard.setACPanel);
-  }
 
   //..................... Method: setTemperaturePanel ..........................
   static setACPanel(_this, response){
