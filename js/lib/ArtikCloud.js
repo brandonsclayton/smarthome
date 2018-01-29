@@ -14,9 +14,6 @@ class ArtikCloud{
     
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
   
-    let ac = new ArtikCloudAuth();
-    ac.checkToken();
-    _this.token = ac.token; 
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 

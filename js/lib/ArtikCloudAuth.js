@@ -34,7 +34,7 @@ class ArtikCloudAuth{
 
 
   //............................. Method: checkToken ........................... 
-  checkToken(){
+  checkToken(classInfo, callback){
     let _this = this; 
     let token = localStorage.getItem("token");
     let tokenExpiresOn = parseFloat(localStorage.getItem("expiresOn"));
@@ -58,6 +58,7 @@ class ArtikCloudAuth{
       ArtikCloudAuth.newToken(_this);
     }
   
+    callback(classInfo);
   }
   //--------------------------- End Method: checkToken -------------------------
 
