@@ -11,7 +11,6 @@ class ArtikCloudAuth{
     _this.authUrl = "https://accounts.artik.cloud";
     _this.clientId = "cbdf047c17a14002830333c0906f1bba";
     _this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
-    _this.redirectUrl = "http://localhost:8080/smarthome/";
     
   }
   //---------------------------- End Constructor -------------------------------
@@ -26,8 +25,7 @@ class ArtikCloudAuth{
         "?prompt=login" +
         "&client_id=" + _this.clientId +
         "&response_type=token" +
-        "&account_type=GOOGLE" +
-        "&redirect_uri=" + _this.redirectUrl;
+        "&account_type=GOOGLE";
     
     window.location = url;
   }
