@@ -57,7 +57,7 @@ class ArtikCloudAuth{
       console.log("Getting new token");
       ArtikCloudAuth.newToken(_this);
     }
-  
+    classInfo.token = _this.token;  
     callback(classInfo);
   }
   //--------------------------- End Method: checkToken -------------------------

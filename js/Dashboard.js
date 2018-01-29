@@ -19,7 +19,6 @@ class Dashboard{
    
      let ac = new ArtikCloudAuth();
     ac.checkToken(_this, Dashboard.getData);
-    _this.token = ac.token;
 
     _this.el = document.querySelector("#content");;
     _this.tempStatusEl = _this.el.querySelector("#temperature-status");
