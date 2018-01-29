@@ -1,0 +1,64 @@
+
+
+#content{
+  display: grid;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 1.75em 0 2.25em 0;
+  padding: 20px;
+}
+
+#dash{
+  margin: auto;
+  width: 100%;
+}
+
+#ac-status .panel-body{
+  font-size: 3.0em;
+  margin: auto;
+  display: grid;
+}
+
+#temperature-status .panel-body.outer-panel{
+  padding: 0;
+}
+
+#temperature-status #average-temp{
+  font-size: 3.0em;
+}
+
+#temperature-status .temp{
+  font-size: 1.5em;
+}
+
+
+#temperature-status .panel-body{
+  padding: 5px 10px;
+}
+
+#temperature-status .temp-left{
+  float: left;
+}
+
+#temperature-status .temp-right{
+  float: right;
+}
+
+.panel-body{
+  text-align: center;
+}
+
+.panel-body p{
+  padding: 0;
+  margin: 0;
+}
+
+.panel-body .room{
+  margin-top: -0.35em;
+  font-size: 1em;
+}
+
+
