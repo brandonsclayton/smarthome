@@ -59,6 +59,7 @@ class Dashboard{
   //--------------------- End Constructor: Temperature -------------------------
 
   static getData(_this){
+    
     _this.artikCloud.getLastMessage(
         _this,
         _this.devices.arduinoTemperature.did,

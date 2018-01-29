@@ -11,9 +11,7 @@ class ArtikCloud{
     let _this = this;
 
     _this.apiUrl = "https://api.artik.cloud/v1.1"
-    
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
-  
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 
@@ -22,7 +20,7 @@ class ArtikCloud{
   //...................... Method: getLastMessage ..............................
   getLastMessage(classInfo, deviceIds, count, callback){
     let _this = this;
-
+    console.log(classInfo.token);
     let type = "GET";
     let headerParams = { "Authorization": "Bearer " + _this.token};
     let queryParams = {
