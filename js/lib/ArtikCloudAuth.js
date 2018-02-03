@@ -6,11 +6,9 @@ class ArtikCloudAuth{
   //............................ Constructor ...................................
   constructor(){
 
-    let _this = this;
-
-    _this.authUrl = "https://accounts.artik.cloud";
-    _this.clientId = "cbdf047c17a14002830333c0906f1bba";
-    _this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
+    this.authUrl = "https://accounts.artik.cloud";
+    this.clientId = "cbdf047c17a14002830333c0906f1bba";
+    this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
     
   }
   //---------------------------- End Constructor -------------------------------
@@ -18,12 +16,11 @@ class ArtikCloudAuth{
 
 
   //............................. Method: login ................................
-  static login(_this){
-    
-    let url = _this.authUrl + 
+  login(){
+    let url = this.authUrl + 
         "/authorize" +
         "?prompt=login" +
-        "&client_id=" + _this.clientId +
+        "&client_id=" + this.clientId +
         "&response_type=token" +
         "&account_type=GOOGLE";
     
@@ -35,7 +32,6 @@ class ArtikCloudAuth{
 
   //............................. Method: checkToken ........................... 
   checkToken(){
-    let _this = this; 
     let token = localStorage.getItem("token");
     let tokenExpiresOn = parseFloat(localStorage.getItem("expiresOn"));
 
@@ -47,24 +43,25 @@ class ArtikCloudAuth{
     
     if( (token == null || isNaN(tokenExpiresOn)) && includesToken){
       console.log("Getting token from URL");
-      ArtikCloudAuth.getAccessToken(_this, url);
+      this.getAccessToken(url);
     }
     else if (tokenExpiresOn - oneDay > dateCheck){
       console.log("Getting token from local storage");
-      _this.token = token;
-      _this.tokenExipresOn = tokenExpiresOn;
+      this.token = token;
+      this.tokenExipresOn = tokenExpiresOn;
     }else{
       console.log("Getting new token");
-      ArtikCloudAuth.newToken(_this);
+      this.newToken();
     }
-  
+    
+
   }
   //--------------------------- End Method: checkToken -------------------------
 
 
 
   //........................... Method: getAccesToken ..........................
-  static getAccessToken(_this, url){
+  getAccessToken(url){
     
     let pars = url.split("&");
     let key, 
@@ -74,29 +71,29 @@ class ArtikCloudAuth{
       key = par.split("=")[0];
       value = par.split("=")[1];
       if (key == "access_token"){
-        _this.token = value;
+        this.token = value;
       }else if (key == "expires_in"){
         let ts = new Date().getTime() + value * 1000;
-        _this.expiresOn = ts;
+        this.expiresOn = ts;
       }
     });
     
-    ArtikCloudAuth.setToken(_this);
+    this.setToken();
   }
   //--------------------- End Method: getAccessToken ---------------------------
 
 
   //......................... Method: setToken .................................
-  static setToken(_this){
-    localStorage.setItem("token", _this.token);
-    localStorage.setItem("expiresOn", _this.expiresOn);
+  setToken(){
+    localStorage.setItem("token", this.token);
+    localStorage.setItem("expiresOn", this.expiresOn);
   }
   //------------------------ Method: setToken ----------------------------------
 
 
 
   //....................... Method: newToken ...................................
-  static newToken(_this){
+  newToken(){
     
     let modalD3 = d3.select("body")
         .append("div")
@@ -139,7 +136,7 @@ class ArtikCloudAuth{
     });
     
     contentD3.on("click", function(){
-      ArtikCloudAuth.login(_this);
+      this.login();
     });
 
   }

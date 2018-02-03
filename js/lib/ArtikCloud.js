@@ -7,16 +7,9 @@ class ArtikCloud{
 
   //.......................... Constructor: ArtikCloud .........................
   constructor(){
-    
     let _this = this;
-
     _this.apiUrl = "https://api.artik.cloud/v1.1"
-    
     _this.wssUrl = "wss://api.artik.cloud/v1.1";
-  
-    let ac = new ArtikCloudAuth();
-    ac.checkToken();
-    _this.token = ac.token; 
   }
   //----------------------- End Constructor: ArtikCloud ------------------------
 

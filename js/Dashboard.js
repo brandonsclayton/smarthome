@@ -4,42 +4,42 @@
 class Dashboard{
 
 
-  //.......................... Constructor: Temperature ........................
   constructor(){
 
-    let _this = this; 
+    this.footer = new Footer();
 
-    _this.footer = new Footer();
+    this.header = new Header();
+    this.header.setTitle("Dashboard");
 
-    _this.header = new Header();
-    _this.header.setTitle("Dashboard");
-
-    _this.devices = new Devices();
-    _this.artikCloud = new ArtikCloud();
-    
-    _this.el = document.querySelector("#content");;
-    _this.tempStatusEl = _this.el.querySelector("#temperature-status");
-    _this.avgTempEl = _this.el.querySelector("#average-temp");
-    _this.livingRoomTempEl = _this.el.querySelector("#living-room-temp");
-    _this.bedroomTempEl = _this.el.querySelector("#bedroom-temp");
-    _this.acStatusEl = _this.el.querySelector("#ac-status");
-    _this.acPanelBody = _this.acStatusEl.querySelector(".panel-body");
-    _this.tempOuterEl = _this.tempStatusEl.querySelector(".outer-panel");
+    this.devices = new Devices();
+    this.artikCloud = new ArtikCloud();
 
 
-    _this.artikCloud.getLastMessage(
-        _this,
-        _this.devices.arduinoTemperature.did,
-        1,
-        Dashboard.setTemperaturePanel);
+    this.el = document.querySelector("#content");;
+    this.tempStatusEl = this.el.querySelector("#temperature-status");
+    this.avgTempEl = this.el.querySelector("#average-temp");
+    this.livingRoomTempEl = this.el.querySelector("#living-room-temp");
+    this.bedroomTempEl = this.el.querySelector("#bedroom-temp");
+    this.acStatusEl = this.el.querySelector("#ac-status");
+    this.acPanelBody = this.acStatusEl.querySelector(".panel-body");
+    this.tempOuterEl = this.tempStatusEl.querySelector(".outer-panel");
 
     
-    _this.artikCloud.getLastMessage(
+
+    /*
+    this.artikCloud.getLastMessage(
+       _this,
+       _this.devices.arduinoTemperature.did,
+       1,
+       Dashboard.setTemperaturePanel);
+
+    
+    this.artikCloud.getLastMessage(
         _this,
         _this.devices.harmonyAC.did,
         1,
         Dashboard.setACPanel);
-    
+    */
     /*    
     _this.artikCloud.getLiveMessage(
         _this,
@@ -71,8 +71,6 @@ class Dashboard{
     */
 
   }
-  //--------------------- End Constructor: Temperature -------------------------
-
 
 
   //..................... Method: setTemperaturePanel ..........................
