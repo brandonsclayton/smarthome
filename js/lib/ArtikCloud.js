@@ -155,7 +155,7 @@ class ArtikCloud{
         .attr("role", "dialog");
 
     let contentD3 = modalD3.append("div")
-        .attr("class", "modal-dialog modal-sm")
+        .attr("class", "modal-dialog")
         .append("div")
         .attr("class", "modal-content");
   
