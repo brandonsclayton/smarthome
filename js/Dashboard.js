@@ -1,20 +1,17 @@
 
 
 
-class Dashboard{
+class Dashboard extends ArtikCloud{
 
 
   constructor(){
-
+    super();
     this.footer = new Footer();
 
     this.header = new Header();
     this.header.setTitle("Dashboard");
-
     this.devices = new Devices();
-    this.artikCloud = new ArtikCloud();
-
-
+   
     this.el = document.querySelector("#content");;
     this.tempStatusEl = this.el.querySelector("#temperature-status");
     this.avgTempEl = this.el.querySelector("#average-temp");
@@ -24,60 +21,45 @@ class Dashboard{
     this.acPanelBody = this.acStatusEl.querySelector(".panel-body");
     this.tempOuterEl = this.tempStatusEl.querySelector(".outer-panel");
 
-    
-
-    /*
-    this.artikCloud.getLastMessage(
-       _this,
-       _this.devices.arduinoTemperature.did,
-       1,
-       Dashboard.setTemperaturePanel);
-
-    
-    this.artikCloud.getLastMessage(
-        _this,
-        _this.devices.harmonyAC.did,
-        1,
-        Dashboard.setACPanel);
-    */
-    /*    
-    _this.artikCloud.getLiveMessage(
-        _this,
-        _this.devices.arduinoTemperature.did,
-        Dashboard.setTemperaturePanel);
-    */
-    /*
-    _this.artikCloud.getLastMessage(
-        _this,
-        _this.devices.harmonyAC.did + "," 
-            + _this.devices.arduinoTemperature.did,
-        1,
-        Dashboard.setPanels);
-    
-    _this.artikCloud.getLiveMessage(
-        _this,
-        _this.devices.arduinoTemperature,
-        );
-    */
-    
-    
-    /*
-    _this.artikCloud.postMessage(_this, 
-        _this.devices.arduinoTemperature,
-        {"averageTemperature":73.52,
-            "bedroomTemperature":74.75,
-            "livingRoomTemperature":72.28}, 
-        Dashboard.printResponse);
-    */
-
+    if (this.token != null || this.token != undefined){
+      this.getData();
+    }
   }
 
+  getData(){
+    
+    this.getLastMessage(
+        this.devices.arduinoTemperature.did,
+        1,
+        this.setTemperaturePanel);
+    
+    this.getLastMessage(
+        this.devices.harmonyAC.did,
+        1,
+        this.setACPanel);
+  
+    
+    this.getLiveMessage(
+        this.devices.arduinoTemperature.did,
+        this.setTemperaturePanel);
+    
+    this.getLiveMessage(
+        this.devices.harmonyAC.did,
+        this.setACPanel);
+  }
 
   //..................... Method: setTemperaturePanel ..........................
-  static setACPanel(_this, response){
-    let metadata = response.data[0];
-    let data = metadata.data;
-    let ts = metadata.ts;
+  setACPanel(_this, response, isLive = false){
+    let data;
+    let ts;
+    if (isLive){
+      data = response.data;
+      ts = response.ts;
+    }else{
+      let metadata = response.data[0];
+      data = metadata.data;
+      ts = metadata.ts;
+    }
  
     let date = new Date(ts).toLocaleDateString();
     let time = new Date(ts).toLocaleTimeString();
@@ -98,19 +80,25 @@ class Dashboard{
   
   
   //..................... Method: setTemperaturePanel ..........................
-  static setTemperaturePanel(_this, response){
+  setTemperaturePanel(_this, response, isLive = false){
+    let data;
+    let ts;
+    if (isLive){
+      data = response.data;
+      ts = response.ts;
+    }else{
+      let metadata = response.data[0];
+      data = metadata.data;
+      ts = metadata.ts;
+    }
     
-    let metadata = response.data[0];
-    let data = metadata.data;
-    let ts = metadata.ts;
- 
     let date = new Date(ts).toLocaleDateString();
     let time = new Date(ts).toLocaleTimeString();
    
     let temp = [
-        [_this.avgTempEl, data.Average_Temperature],
-        [_this.bedroomTempEl, data.Bedroom_Temperature],
-        [_this.livingRoomTempEl, data.Living_Room_Temperature]
+      [_this.avgTempEl, data.Average_Temperature],
+      [_this.bedroomTempEl, data.Bedroom_Temperature],
+      [_this.livingRoomTempEl, data.Living_Room_Temperature]
     ];
 
     d3.select(_this.tempStatusEl)
@@ -133,7 +121,7 @@ class Dashboard{
 
 
 
-  static printResponse(_this, response){
+  printResponse(response){
     console.log("Response:");
     console.log(response);
 
