@@ -1,0 +1,10 @@
+
+#content{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 1.75em 0 2.25em 0;
+  padding: 20px;
+}
