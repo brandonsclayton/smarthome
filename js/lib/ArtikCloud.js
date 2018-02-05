@@ -9,10 +9,41 @@ class ArtikCloud{
     this.authUrl = "https://accounts.artik.cloud";
     this.clientId = "cbdf047c17a14002830333c0906f1bba";
     this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
+    this.oneDayInMilliSec = 1*24*60*60*1000;
   
     this.checkToken();
   }
 
+  /**
+  * getMessage
+  */
+  getMessage(deviceId, startDate, endDate, callback) {
+    console.log(startDate);
+    console.log(new Date(startDate).toLocaleTimeString() + " " +
+        new Date(startDate).toLocaleDateString());
+    console.log(endDate);
+    console.log(new Date(endDate).toLocaleTimeString() + " " + 
+        new Date(endDate).toLocaleDateString());
+
+    let type = "GET";
+    let headerParams = {"Authorization" : "Bearer " + this.token};
+    let queryParams = {
+      "sdid": deviceId,
+      "startDate": startDate,
+      "endDate": endDate,
+      "count": 500,
+    };
+    let url = this.apiUrl + "/messages";
+
+    Request.request(
+      this,
+      url,
+      type,
+      queryParams,
+      headerParams,
+      callback);
+  }
+  
   /**
   * getLastMessage
   */
@@ -21,7 +52,7 @@ class ArtikCloud{
     let headerParams = { "Authorization": "Bearer " + this.token};
     let queryParams = {
         "sdids": deviceIds,
-        "count": count
+        "count": count,
     };
     let url = this.apiUrl + "/messages/last";
 
@@ -93,7 +124,6 @@ class ArtikCloud{
     let tokenExpiresOn = parseFloat(localStorage.getItem("expiresOn"));
 
     let dateCheck = new Date().getTime();
-    let oneDayInMilliSec = 1*24*60*60*1000;
     
     let url = window.location.hash.substring(1);
     let includesToken = url.includes("access_token"); 
@@ -102,7 +132,7 @@ class ArtikCloud{
       console.log("Getting token from URL");
       this.getAccessToken(url);
     }
-    else if (token != null && tokenExpiresOn - oneDayInMilliSec > dateCheck){
+    else if (token != null && tokenExpiresOn - this.oneDayInMilliSec > dateCheck){
       console.log("Getting token from local storage");
       this.token = token;
       this.tokenExipresOn = tokenExpiresOn;
@@ -192,6 +222,11 @@ class ArtikCloud{
       this.login();
     });
 
+  }
+
+  pastHours(hour){
+    let currentTime = Date.now();
+    return (currentTime - this.oneDayInMilliSec * hour / 24);
   }
 
 }

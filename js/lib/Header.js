@@ -9,7 +9,8 @@ class Header{
     let _this = this;
 
     _this.menuItems = [
-        ["Dashboard", "/smarthome/main.html"],
+      ["Dashboard", "/smarthome/"],
+      ["Temperature", "/smarthome/temp.html"],
     ];
 
 
