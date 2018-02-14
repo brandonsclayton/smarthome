@@ -1,7 +1,7 @@
 'use strict';
 
-
-
+import D3View from './D3View.js';
+import Tooltip from './Tooltip.js';
 
 /**
 * @class D3LinePlot
@@ -59,7 +59,7 @@
 *
 * @author Brandon Clayton
 */
-class D3LinePlot extends D3View{
+export default class D3LinePlot extends D3View{
   
   
   //..................... D3LinePlot Constructor ...............................

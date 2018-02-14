@@ -1,13 +1,8 @@
+'use strict'
 
+export default class Footer {
 
-
-
-
-class Footer{
-
-  constructor(){
-    let _this = this;
-
+  constructor() {
     let footerD3 = d3.select("body")
         .append("footer")
         .attr("class", "Footer");
@@ -17,11 +12,9 @@ class Footer{
    
     footerD3.lower();
 
-    _this.footerEl = footerD3.node();
-    _this.settingEl = _this.footerEl.querySelector(".settings");
+    this.footerEl = footerD3.node();
+    this.settingEl = this.footerEl.querySelector(".settings");
 
   }
-
-
 
 }

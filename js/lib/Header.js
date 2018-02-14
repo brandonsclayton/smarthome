@@ -1,18 +1,12 @@
+'use strict'
 
-
-
-
-class Header{
-
+export default class Header {
   
   constructor(){
-    let _this = this;
-
-    _this.menuItems = [
-      ["Dashboard", "/smarthome/"],
-      ["Temperature", "/smarthome/temp.html"],
+    this.menuItems = [
+        ["Dashboard", "/smarthome"],
+        ['Temperature', '/smarthome/temp.html']
     ];
-
 
     let headerD3 = d3.select("body")
         .append("header")
@@ -31,7 +25,7 @@ class Header{
         .attr("aria-labelledby", "header-menu");
     
     headerMenuD3.selectAll("li")
-        .data(_this.menuItems)
+        .data(this.menuItems)
         .enter()
         .append("li")
         .append("a")
@@ -43,16 +37,13 @@ class Header{
 
     headerD3.lower();
     
-    _this.headerEl = headerD3.node();
-    _this.headerListEl = _this.headerEl.querySelector("ul");
-    _this.headerTitleEl = _this.headerEl.querySelector(".header-title");
+    this.headerEl = headerD3.node();
+    this.headerListEl = this.headerEl.querySelector("ul");
+    this.headerTitleEl = this.headerEl.querySelector(".header-title");
   }
 
-
   setTitle(title){
-    let _this = this;
-
-    d3.select(_this.headerTitleEl)
+    d3.select(this.headerTitleEl)
         .text(title);
   }
 

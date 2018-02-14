@@ -1,16 +1,14 @@
 'use static'
 
-
-class ArtikCloud{
+export default class ArtikCloud{
   
   constructor(){
+    this.oneDayInMilliSec = 1*24*60*60*1000;
     this.apiUrl = "https://api.artik.cloud/v1.1"
     this.wssUrl = "wss://api.artik.cloud/v1.1";
     this.authUrl = "https://accounts.artik.cloud";
     this.clientId = "cbdf047c17a14002830333c0906f1bba";
     this.clientSecret = "9d4bb87414a64b50a321c3c8bd5c640c";
-    this.oneDayInMilliSec = 1*24*60*60*1000;
-  
     this.checkToken();
   }
 
@@ -35,15 +33,14 @@ class ArtikCloud{
     };
     let url = this.apiUrl + "/messages";
 
-    Request.request(
-      this,
+    this.request(
       url,
       type,
       queryParams,
       headerParams,
       callback);
   }
-  
+
   /**
   * getLastMessage
   */
@@ -52,12 +49,11 @@ class ArtikCloud{
     let headerParams = { "Authorization": "Bearer " + this.token};
     let queryParams = {
         "sdids": deviceIds,
-        "count": count,
+        "count": count
     };
     let url = this.apiUrl + "/messages/last";
 
-    Request.request(
-        this,
+    this.request(
         url, 
         type, 
         queryParams, 
@@ -77,7 +73,8 @@ class ArtikCloud{
     webSocket.onmessage = (response) => {
       let message = JSON.parse(response.data);
       if (message.mid != undefined){
-        callback(this, message, true);
+        this.liveCallback = callback;
+        this.liveCallback(message, true);
       }
     }
   }
@@ -94,7 +91,7 @@ class ArtikCloud{
           "data": data
       });
     
-    Request.request(
+    this.request(
         url, 
         type, 
         queryParams, 
@@ -119,20 +116,20 @@ class ArtikCloud{
   /**
   * checkToken
   */
-  checkToken(callback){
+  checkToken(){
     let token = localStorage.getItem("token");
     let tokenExpiresOn = parseFloat(localStorage.getItem("expiresOn"));
-
     let dateCheck = new Date().getTime();
     
     let url = window.location.hash.substring(1);
     let includesToken = url.includes("access_token"); 
-    
-    if( (token == null || isNaN(tokenExpiresOn)) && includesToken){
+   
+    if(includesToken){
       console.log("Getting token from URL");
       this.getAccessToken(url);
     }
-    else if (token != null && tokenExpiresOn - this.oneDayInMilliSec > dateCheck){
+    else if (token != null && 
+        (tokenExpiresOn - this.oneDayInMilliSec > dateCheck)) {
       console.log("Getting token from local storage");
       this.token = token;
       this.tokenExipresOn = tokenExpiresOn;
@@ -148,6 +145,7 @@ class ArtikCloud{
   getAccessToken(url){
     
     let pars = url.split("&");
+    window.location.hash = '';
     let key, 
         code,
         value;
@@ -224,7 +222,32 @@ class ArtikCloud{
 
   }
 
-  pastHours(hour){
+  request(
+      url,
+      type,
+      queryParams,
+      headerParams,
+      callback){
+    $.ajax({
+        type: type,
+        url: url,
+        headers: headerParams,
+        data: queryParams,
+        success: (response) => {
+          try{
+            this.requestCallback = callback;
+            this.requestCallback(response);
+          }catch(err){
+          }
+        },
+        error: (error) => {
+          console.log("Request Class Error:");
+          console.log(error);
+        }
+    });
+  }
+
+  pastHours(hour) {
     let currentTime = Date.now();
     return (currentTime - this.oneDayInMilliSec * hour / 24);
   }
