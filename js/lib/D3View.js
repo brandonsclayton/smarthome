@@ -82,7 +82,7 @@
 *
 * @author Brandon Clayton
 */
-class D3View{
+export default class D3View {
 
   //........................... D3View Constructor .............................
   constructor(containerEl, 
@@ -159,9 +159,9 @@ class D3View{
       plotHeight: 504,
       plotWidth: 896,
       plotRatio: 16/9,
-      pointRadius: 3.5,
-      pointRadiusSelection: 5.5,
-      pointRadiusTooltip: 8.5,
+      pointRadius: 3,
+      pointRadiusSelection: 5,
+      pointRadiusTooltip: 8,
       printTitle: true,
       printFooter: true,
       printFooterPadding: 20,

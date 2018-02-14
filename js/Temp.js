@@ -1,7 +1,12 @@
+'use strict'
 
+import ArtikCloud from './lib/ArtikCloud.js';
+import Devices from './lib/Devices.js';
+import Footer from './lib/Footer.js';
+import Header from './lib/Header.js';
+import D3LinePlot from './lib/D3LinePlot.js';
 
-
-class Temp extends ArtikCloud{
+export default class Temp extends ArtikCloud{
 
   constructor(){
     super();
@@ -53,6 +58,7 @@ class Temp extends ArtikCloud{
       yAxisScale: "linear",
     };
     let tempOptions = {
+      legendLocation: 'bottomleft',
       tooltipText: ["Room", "Date", "Temperature"],
     };
     let acOptions = {};
@@ -65,7 +71,7 @@ class Temp extends ArtikCloud{
   }
 
 
-  plotTemp(_this, response, isLive = false){
+  plotTemp(response, isLive = false){
     let data = response.data;
     let avgData = [];
     let bedroomData = [];
@@ -86,23 +92,20 @@ class Temp extends ArtikCloud{
     seriesData.push(d3.zip(ts, bedroomData));
     seriesData.push(d3.zip(ts, livingData));
 
-    _this.plot.title = "Temperature";
-    _this.plot.upperPanel.data = seriesData;
-    _this.plot.upperPanel.dataTableTitle = "Temperature";
-    _this.plot.upperPanel.labels = seriesLabels;
-    _this.plot.upperPanel.metadata = {
+    this.plot.title = "Temperature";
+    this.plot.upperPanel.data = seriesData;
+    this.plot.upperPanel.dataTableTitle = "Temperature";
+    this.plot.upperPanel.labels = seriesLabels;
+    this.plot.upperPanel.metadata = {
       url: window.location, 
       date: new Date()
     };
-    _this.plot.upperPanel.ids = seriesIds;
-    _this.plot.upperPanel.xLabel = "Date";
-    _this.plot.upperPanel.yLabel = "Temperature"
+    this.plot.upperPanel.ids = seriesIds;
+    this.plot.upperPanel.xLabel = "Date";
+    this.plot.upperPanel.yLabel = "Temperature"
     
-    _this.plot.plotData(_this.plot.upperPanel);
+    this.plot.plotData(this.plot.upperPanel, null , [65, 80]);
     
-    d3.select(_this.plot.upperPanel.svgEl)
-        .call(d3.zoom().on("zoom", () => {
-        }));
   }
 
 

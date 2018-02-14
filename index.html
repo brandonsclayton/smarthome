@@ -20,7 +20,6 @@
 
   <div id="content">
     <div id="dash"> 
-      
       <div class="col-sm-offset-1 col-sm-4">
         <div class="panel panel-default hidden" id="temperature-status">
           <div class="panel-heading">
@@ -63,15 +62,10 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="js/lib/Header.js" charset="UTF-8"></script>
-  <script src="js/lib/Footer.js" charset="UTF-8"></script>
-  <script src="js/lib/Request.js" charset="UTF-8"></script>
-  <script src="js/lib/ArtikCloud.js" charset="UTF-8"></script>
-  <script src="js/lib/Devices.js" charset="UTF-8"></script>
-  <script src="js/Dashboard.js" charset="UTF-8"></script>
  
-  <script>
-    let dash = new Dashboard();
+  <script type='module'>
+    import Dashboard from './js/Dashboard.js';
+    new Dashboard();
   </script>
 
 

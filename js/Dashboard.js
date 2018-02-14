@@ -1,8 +1,11 @@
+'use strict'
 
+import ArtikCloud from './lib/ArtikCloud.js';
+import Devices from './lib/Devices.js';
+import Footer from './lib/Footer.js';
+import Header from './lib/Header.js';
 
-
-class Dashboard extends ArtikCloud{
-
+export default class Dashboard extends ArtikCloud{
 
   constructor(){
     super();
@@ -27,7 +30,6 @@ class Dashboard extends ArtikCloud{
   }
 
   getData(){
-    
     this.getLastMessage(
         this.devices.arduinoTemperature.did,
         1,
@@ -48,8 +50,7 @@ class Dashboard extends ArtikCloud{
         this.setACPanel);
   }
 
-  //..................... Method: setTemperaturePanel ..........................
-  setACPanel(_this, response, isLive = false){
+  setACPanel(response, isLive = false){
     let data;
     let ts;
     if (isLive){
@@ -65,22 +66,18 @@ class Dashboard extends ArtikCloud{
     let time = new Date(ts).toLocaleTimeString();
     let state = data.state.toUpperCase(); 
 
-    d3.select(_this.acStatusEl)
+    d3.select(this.acStatusEl)
         .classed("hidden", false)
         .select(".panel-body")
         .text(state)
     
-    d3.select(_this.acStatusEl)
+    d3.select(this.acStatusEl)
         .select(".panel-footer")
         .text("Last Updated: " + time + " on " + date);
 
   }
-  //------------------- End Method: setTemperaturePanel ------------------------
   
-  
-  
-  //..................... Method: setTemperaturePanel ..........................
-  setTemperaturePanel(_this, response, isLive = false){
+  setTemperaturePanel(response, isLive = false){
     let data;
     let ts;
     if (isLive){
@@ -96,12 +93,12 @@ class Dashboard extends ArtikCloud{
     let time = new Date(ts).toLocaleTimeString();
    
     let temp = [
-      [_this.avgTempEl, data.Average_Temperature],
-      [_this.bedroomTempEl, data.Bedroom_Temperature],
-      [_this.livingRoomTempEl, data.Living_Room_Temperature]
+      [this.avgTempEl, data.Average_Temperature],
+      [this.bedroomTempEl, data.Bedroom_Temperature],
+      [this.livingRoomTempEl, data.Living_Room_Temperature]
     ];
 
-    d3.select(_this.tempStatusEl)
+    d3.select(this.tempStatusEl)
         .classed("hidden", false)
         .selectAll(".temp")
         .select(function(d,i){return temp[i][0];})
@@ -109,17 +106,14 @@ class Dashboard extends ArtikCloud{
           return temp[i][1] + "℉ "; 
         });
     
-    d3.select(_this.tempStatusEl)
+    d3.select(this.tempStatusEl)
         .select(".panel-footer")
         .text("Last Updated: " + time + " on " + date);
     
-    let height = _this.tempOuterEl.clientHeight;
-    d3.select(_this.acPanelBody)
+    let height = this.tempOuterEl.clientHeight;
+    d3.select(this.acPanelBody)
         .style("height", height + "px");
   }
-  //------------------- End Method: setTemperaturePanel ------------------------
-
-
 
   printResponse(response){
     console.log("Response:");

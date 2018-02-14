@@ -66,7 +66,7 @@
 *
 */
 
-class Tooltip{
+export default class Tooltip{
   
   //...................... Tooltip Contructor ..................................
   constructor(plotObj,selectedEl){
