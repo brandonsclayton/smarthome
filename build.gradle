@@ -1,0 +1,43 @@
+
+apply plugin: 'java'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src']
+    }
+  }
+}
+
+
+repositories {                                                                  
+  jcenter()                                                                     
+}                                                                               
+                                                                                
+dependencies {                                                                  
+	providedCompile 'org.apache.tomcat:tomcat-catalina:8.0.45'                    
+	compile 'com.github.jsimone:webapp-runner:8.5.11.3'
+  compile 'com.google.guava:guava:24.1-jre'
+  compile "cloud.artik:artikcloud-java:2.2.2"
+}      
+
+task stage() {
+  dependsOn clean, war
+}
+
+war.mustRunAfter clean
+
+war {
+  webAppDirName = 'webapp'
+}
+
+task copyToLib(type: Copy) {
+	into "$buildDir/server"
+	from(configurations.compile) {
+	  include "webapp-runner*"
+  }
+}
+
+stage.dependsOn(copyToLib)
