@@ -7,7 +7,8 @@ public enum DeviceGroup {
 
   TEMPERATURE(
       Sets.newHashSet(
-          Device.TEMPERATURE));
+          Device.TEMPERATURE,
+          Device.AC));
   
   Set<Device> devices;
   

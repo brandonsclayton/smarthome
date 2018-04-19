@@ -4,8 +4,8 @@ export default class Header {
   
   constructor(){
     this.menuItems = [
-        ["Dashboard", "/smarthome"],
-        ['Temperature', '/smarthome/temp.html']
+        ['Dashboard', ''],
+        ['Temperature', 'temp.html']
     ];
 
     let headerD3 = d3.select("body")
