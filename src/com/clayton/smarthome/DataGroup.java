@@ -29,7 +29,7 @@ public class DataGroup {
       return new DataGroup(this);
     }
     
-    Builder add(Date date, double value) {
+    Builder add(Date date, Object value) {
       this.data.add(new Object[] {date, value});
       return this;
     }

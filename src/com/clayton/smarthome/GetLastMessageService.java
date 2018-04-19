@@ -78,6 +78,7 @@ public class GetLastMessageService extends HttpServlet {
 	      requestData.count);
 	  
 	  List<NormalizedMessage> temperatureMessage = messages.get(Device.TEMPERATURE);
+	  
 	  DataGroup.Builder avgTemp = DataGroup.builder()
 	      .display("Average Temperature")
 	      .id("Average_Temperature");
@@ -103,8 +104,27 @@ public class GetLastMessageService extends HttpServlet {
 	  dataGroupSet.add(bedTemp.build());
 	  dataGroupSet.add(livTemp.build());
 	  
+	  
+	  List<NormalizedMessage> acMessage = messages.get(Device.AC);
+    
+    DataGroup.Builder ac = DataGroup.builder()
+        .display("AC")
+        .id("AC");
+    
+    for (NormalizedMessage message : acMessage) {
+      Map<String, Object> messageData = message.getData();
+      Long ts = message.getTs();
+      Date date = new Date(ts);
+      
+      ac.add(date, (String) messageData.get("state"));
+    }
+    
+    Set<DataGroup> acDataGroupSet = new HashSet<>();
+    acDataGroupSet.add(ac.build());
+	  
 	  Set<ResponseGroup> responseGroupSet = new HashSet<>();
 	  responseGroupSet.add(new ResponseGroup(Device.TEMPERATURE, dataGroupSet));
+	  responseGroupSet.add(new ResponseGroup(Device.AC, acDataGroupSet));
 	  
 	  Response response = Response.builder()
 	      .name(SERVICE_NAME)

@@ -5,9 +5,9 @@ import Devices from './lib/Devices.js';
 import Footer from './lib/Footer.js';
 import Header from './lib/Header.js';
 
-export default class Dashboard extends ArtikCloud{
+export default class Dashboard extends ArtikCloud {
 
-  constructor(){
+  constructor() {
     super();
     this.footer = new Footer();
 
@@ -23,34 +23,43 @@ export default class Dashboard extends ArtikCloud{
     this.acStatusEl = this.el.querySelector("#ac-status");
     this.acPanelBody = this.acStatusEl.querySelector(".panel-body");
     this.tempOuterEl = this.tempStatusEl.querySelector(".outer-panel");
-
-    if (this.token != null || this.token != undefined){
+    
+    this.url = window.location.origin + window.location.pathname;
+    this.temperatureUrl = this.url + 'getLastMessage?devicegroup=temperature' +
+        '&count=1';
+    
+    if (this.token != null || this.token != undefined) {
       this.getData();
     }
+    
   }
 
-  getData(){
-    this.getLastMessage(
+  getData() {
+    let promise = $.getJSON(this.temperatureUrl);
+    promise.done((usage) => {
+      let temperature = usage.response.find((response) => {
+        return response.device == 'TEMPERATURE';
+      });
+      
+      let ac = usage.response.find((response) => {
+        return response.device == 'AC';
+      });
+
+      this.setTemp(temperature);
+      this.setAC(ac);
+    });
+    /*
+    this.getLiveMessage(
         this.devices.arduinoTemperature.did,
-        1,
         this.setTemperaturePanel);
     
-    this.getLastMessage(
+    this.getLiveMessage(
         this.devices.harmonyAC.did,
-        1,
         this.setACPanel);
+    */
+  }
   
-    
-    this.getLiveMessage(
-        this.devices.arduinoTemperature.did,
-        this.setTemperaturePanel);
-    
-    this.getLiveMessage(
-        this.devices.harmonyAC.did,
-        this.setACPanel);
-  }
-
-  setACPanel(response, isLive = false){
+  setACPanel(response, isLive = false) {
     let data;
     let ts;
     if (isLive){
@@ -76,8 +85,37 @@ export default class Dashboard extends ArtikCloud{
         .text("Last Updated: " + time + " on " + date);
 
   }
+ 
+  setAC(response) {
+    d3.select(this.acStatusEl)
+        .classed('hidden', false)
+        .select('.panel-body')
+        .text(response.dataGroup[0].data[0][1]);
+
+    d3.select(this.acStatusEl)
+        .select('.panel-footer')
+        .text(response.dataGroup[0].data[0][0]);
+  }
+
+  setTemp(response) {
+    d3.select(this.tempStatusEl)
+        .classed('hidden', false);
+
+    for (let d of response.dataGroup) {
+      d3.select(this.tempStatusEl)
+          .select('#' + d.id)
+          .html(d.data[0][1] + '℉ '); 
+    }
+
+    d3.select(this.tempStatusEl)
+        .select('.panel-footer')
+        .datum(response.dataGroup[0])
+        .text((d, i) => {
+          return d.data[0][0]; 
+        });
+  }
   
-  setTemperaturePanel(response, isLive = false){
+  setTemperaturePanel(response, isLive = false) {
     let data;
     let ts;
     if (isLive){
@@ -115,7 +153,7 @@ export default class Dashboard extends ArtikCloud{
         .style("height", height + "px");
   }
 
-  printResponse(response){
+  printResponse(response) {
     console.log("Response:");
     console.log(response);
 
