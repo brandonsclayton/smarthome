@@ -1,7 +1,7 @@
-
 apply plugin: 'java'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'war'
+
 
 sourceSets {
   main {
@@ -11,16 +11,26 @@ sourceSets {
   }
 }
 
-
 repositories {                                                                  
   jcenter()                                                                     
+  ivy {
+    url 'https://dev01-earthquake.cr.usgs.gov/nshmp-haz-ws/apps/js/lib'
+    layout 'pattern', {
+      artifact '[module].[ext]'
+    }
+  }
 }                                                                               
-                                                                                
+
+configurations {
+  js
+}
+
 dependencies {                                                                  
 	providedCompile 'org.apache.tomcat:tomcat-catalina:8.0.45'                    
 	compile 'com.github.jsimone:webapp-runner:8.5.11.3'
   compile 'com.google.guava:guava:24.1-jre'
   compile "cloud.artik:artikcloud-java:2.2.2"
+  js ':D3LinePlot@js'
 }      
 
 task stage() {
@@ -41,3 +51,8 @@ task copyToLib(type: Copy) {
 }
 
 stage.dependsOn(copyToLib)
+
+task fetchJs(type: Copy) {
+  from configurations.js
+  into "$buildDir/js"
+}
