@@ -3,6 +3,7 @@ package com.clayton.smarthome;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -55,6 +56,7 @@ public class GetLastMessageService extends HttpServlet {
 	    HttpServletResponse httpResponse) 
 	        throws ServletException, IOException {
 	  
+	  TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
 	  Response svcResponse = processRequestTemperature(httpRequest);
 	  String json = gson.toJson(svcResponse);
 		httpResponse.getWriter().print(json);
