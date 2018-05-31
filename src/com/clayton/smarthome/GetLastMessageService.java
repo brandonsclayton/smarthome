@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.beust.jcommander.internal.Sets;
+import com.clayton.smarthome.ArtikCloud.MessageData;
+import com.clayton.smarthome.ArtikCloud.MessageReturn;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -39,14 +41,6 @@ public class GetLastMessageService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	static final String SERVICE_NAME = "Get the last normalized messages from Artik Cloud.";
 	
-	static Gson gson;
-	
-	static {
-	  gson = new GsonBuilder()
-	      .setPrettyPrinting()
-	      .create();
-	}
-	
 	/**
 	 * HTTP servlet for getting last normalized message
 	 */
@@ -58,7 +52,7 @@ public class GetLastMessageService extends HttpServlet {
 	  
 	  TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
 	  Response svcResponse = processRequestTemperature(httpRequest);
-	  String json = gson.toJson(svcResponse);
+	  String json = Util.GSON.toJson(svcResponse);
 		httpResponse.getWriter().print(json);
 	}
 	
@@ -75,58 +69,51 @@ public class GetLastMessageService extends HttpServlet {
 	      
 	  Map<String, String[]> params = httpRequest.getParameterMap();
 	  RequestData requestData = new RequestData(params);
-	  Map<Device, List<NormalizedMessage>> messages = ArtikCloud.getLastMessage(
+	  MessageReturn messages = ArtikCloud.getLastMessage(
 	      requestData.deviceGroup,
 	      requestData.count);
 	  
-	  List<NormalizedMessage> temperatureMessage = messages.get(Device.TEMPERATURE);
+	  List<MessageData> temperatureMessage = messages.getDeviceData(Device.TEMPERATURE);
 	  
-	  DataGroup.Builder avgTemp = DataGroup.builder()
+	  DataGroup avgTemp = DataGroup.builder()
 	      .display("Average Temperature")
-	      .id("Average_Temperature");
-	  DataGroup.Builder bedTemp = DataGroup.builder()
+	      .id("Average_Temperature")
+	      .addAll(temperatureMessage, DeviceField.AVERAGE_TEMPERATURE)
+	      .build();
+	      
+	  DataGroup bedTemp = DataGroup.builder()
 	      .display("Bedroom Temperature")
-	      .id("Bedroom_Temperature");
-	  DataGroup.Builder livTemp = DataGroup.builder()
-	      .display("Living Room Temperature")
-	      .id("Living_Room_Temperature");
+	      .id("Bedroom_Temperature")
+	      .addAll(temperatureMessage, DeviceField.BEDROOM_TEMPERATURE)
+	      .build();
 	  
-	  for (NormalizedMessage message : temperatureMessage) {
-	    Map<String, Object> messageData = message.getData();
-	    Long ts = message.getTs();
-	    Date date = new Date(ts);
-	    
-	    avgTemp.add(date, (Double) messageData.get("Average_Temperature"));
-	    bedTemp.add(date, (Double) messageData.get("Bedroom_Temperature"));
-	    livTemp.add(date, (Double) messageData.get("Living_Room_Temperature"));
-	  }
+	  DataGroup livTemp = DataGroup.builder()
+	      .display("Living Room Temperature")
+	      .id("Living_Room_Temperature")
+	      .addAll(temperatureMessage, DeviceField.LIVING_ROOM_TEMPERATURE)
+	      .build();
 	  
 	  Set<DataGroup> dataGroupSet = new HashSet<>();
-	  dataGroupSet.add(avgTemp.build());
-	  dataGroupSet.add(bedTemp.build());
-	  dataGroupSet.add(livTemp.build());
+	  dataGroupSet.add(avgTemp);
+	  dataGroupSet.add(bedTemp);
+	  dataGroupSet.add(livTemp);
 	  
-	  
-	  List<NormalizedMessage> acMessage = messages.get(Device.AC);
+	  List<MessageData> acMessage = messages.getDeviceData(Device.AC);
     
-    DataGroup.Builder ac = DataGroup.builder()
+    DataGroup ac = DataGroup.builder()
         .display("AC")
-        .id("AC");
-    
-    for (NormalizedMessage message : acMessage) {
-      Map<String, Object> messageData = message.getData();
-      Long ts = message.getTs();
-      Date date = new Date(ts);
-      
-      ac.add(date, (String) messageData.get("state"));
-    }
+        .id("AC")
+        .addAll(acMessage, DeviceField.STATE)
+        .build();
     
     Set<DataGroup> acDataGroupSet = new HashSet<>();
-    acDataGroupSet.add(ac.build());
+    acDataGroupSet.add(ac);
 	  
 	  Set<ResponseGroup> responseGroupSet = new HashSet<>();
-	  responseGroupSet.add(new ResponseGroup(Device.TEMPERATURE, dataGroupSet));
-	  responseGroupSet.add(new ResponseGroup(Device.AC, acDataGroupSet));
+	  responseGroupSet.add(
+	      new ResponseGroup(Device.TEMPERATURE, dataGroupSet, temperatureMessage));
+	  responseGroupSet.add(
+	      new ResponseGroup(Device.AC, acDataGroupSet, acMessage));
 	  
 	  Response response = Response.builder()
 	      .name(SERVICE_NAME)
@@ -148,6 +135,5 @@ public class GetLastMessageService extends HttpServlet {
 	    this.count = Integer.parseInt(params.get("count")[0]);
 	  }
 	}
-	
 	
 }
