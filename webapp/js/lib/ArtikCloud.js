@@ -13,55 +13,6 @@ export default class ArtikCloud{
   }
 
   /**
-  * getMessage
-  */
-  getMessage(deviceId, startDate, endDate, callback) {
-    console.log(startDate);
-    console.log(new Date(startDate).toLocaleTimeString() + " " +
-        new Date(startDate).toLocaleDateString());
-    console.log(endDate);
-    console.log(new Date(endDate).toLocaleTimeString() + " " + 
-        new Date(endDate).toLocaleDateString());
-
-    let type = "GET";
-    let headerParams = {"Authorization" : "Bearer " + this.token};
-    let queryParams = {
-      "sdid": deviceId,
-      "startDate": startDate,
-      "endDate": endDate,
-      "count": 500,
-    };
-    let url = this.apiUrl + "/messages";
-
-    this.request(
-      url,
-      type,
-      queryParams,
-      headerParams,
-      callback);
-  }
-
-  /**
-  * getLastMessage
-  */
-  getLastMessage(deviceIds, count, callback){
-    let type = "GET";
-    let headerParams = { "Authorization": "Bearer " + this.token};
-    let queryParams = {
-        "sdids": deviceIds,
-        "count": count
-    };
-    let url = this.apiUrl + "/messages/last";
-
-    this.request(
-        url, 
-        type, 
-        queryParams, 
-        headerParams, 
-        callback);   
-  }
-  
-  /**
   * getLiveMessage
   */
   getLiveMessage(deviceIds, callback){

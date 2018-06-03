@@ -40,7 +40,7 @@ export default class Dashboard extends ArtikCloud {
       let temperature = usage.response.find((response) => {
         return response.device == 'TEMPERATURE';
       });
-      
+
       let ac = usage.response.find((response) => {
         return response.device == 'AC';
       });
@@ -48,11 +48,13 @@ export default class Dashboard extends ArtikCloud {
       this.setTemp(temperature);
       this.setAC(ac);
     });
+   
     /*
     this.getLiveMessage(
         this.devices.arduinoTemperature.did,
         this.setTemperaturePanel);
-    
+    */
+    /*
     this.getLiveMessage(
         this.devices.harmonyAC.did,
         this.setACPanel);
@@ -90,11 +92,11 @@ export default class Dashboard extends ArtikCloud {
     d3.select(this.acStatusEl)
         .classed('hidden', false)
         .select('.panel-body')
-        .text(response.dataGroup[0].data[0][1]);
+        .text(response.dataGroup[0].data[0].toUpperCase());
 
     d3.select(this.acStatusEl)
         .select('.panel-footer')
-        .text(response.dataGroup[0].data[0][0]);
+        .text('Last Updated: ' + response.date[0]);
   }
 
   setTemp(response) {
@@ -104,15 +106,12 @@ export default class Dashboard extends ArtikCloud {
     for (let d of response.dataGroup) {
       d3.select(this.tempStatusEl)
           .select('#' + d.id)
-          .html(d.data[0][1] + '℉ '); 
+          .html(d.data[0] + '℉ '); 
     }
 
     d3.select(this.tempStatusEl)
         .select('.panel-footer')
-        .datum(response.dataGroup[0])
-        .text((d, i) => {
-          return d.data[0][0]; 
-        });
+        .text('Last Updated: ' + response.date[0]);
   }
   
   setTemperaturePanel(response, isLive = false) {

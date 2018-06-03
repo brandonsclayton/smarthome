@@ -2,7 +2,7 @@ package com.clayton.smarthome;
 
 import java.util.Set;
 
-import com.clayton.smarthome.GetLastMessageService.RequestData;
+import com.clayton.smarthome.RequestData;
 
 public class Response {
   String name;
