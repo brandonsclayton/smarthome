@@ -1,12 +1,16 @@
 package com.clayton.smarthome;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
+
+import com.clayton.smarthome.ArtikCloud.MessageData;
+
+import com.google.gson.JsonElement;
 
 public class DataGroup {
   String id;
   String display;
-  ArrayList<Object[]> data = new ArrayList<>();
+  List<JsonElement> data; 
   
   DataGroup(Builder builder) {
    this.data = builder.data;
@@ -21,7 +25,7 @@ public class DataGroup {
   static class Builder {
     private String id;
     private String display;
-    private ArrayList<Object[]> data = new ArrayList<>();
+    private List<JsonElement> data = new ArrayList<>();
     
     Builder() {}
     
@@ -29,8 +33,15 @@ public class DataGroup {
       return new DataGroup(this);
     }
     
-    Builder add(Date date, Object value) {
-      this.data.add(new Object[] {date, value});
+    Builder add(JsonElement data) {
+      this.data.add(data);
+      return this;
+    }
+    
+    Builder addAll(List<MessageData> data, DeviceField deviceField) {
+      for (MessageData messageData : data) {
+        this.data.add(messageData.data.get(deviceField.id));
+      }
       return this;
     }
     

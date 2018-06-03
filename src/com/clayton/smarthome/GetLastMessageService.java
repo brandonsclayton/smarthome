@@ -5,10 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import javax.servlet.ServletException;
@@ -17,35 +13,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.beust.jcommander.internal.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import cloud.artik.api.MessagesApi;
-import cloud.artik.client.ApiClient;
-import cloud.artik.client.ApiException;
-import cloud.artik.client.Configuration;
-import cloud.artik.client.auth.OAuth;
-import cloud.artik.model.NormalizedMessage;
-import cloud.artik.model.NormalizedMessagesEnvelope;
+import com.clayton.smarthome.ArtikCloud.MessageData;
+import com.clayton.smarthome.ArtikCloud.MessageReturn;
+import com.clayton.smarthome.RequestData.LastMessageRequestData;
+import com.clayton.smarthome.RequestData.MessageRequestData;
 
 @WebServlet(
     name = "Artik Cloud",
     description = "Artik Cloud connector",
     urlPatterns = {
-        "/getLastMessage"
+        "/getLastMessage",
+        "/getMessage"
     })
 public class GetLastMessageService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	static final String SERVICE_NAME = "Get the last normalized messages from Artik Cloud.";
-	
-	static Gson gson;
-	
-	static {
-	  gson = new GsonBuilder()
-	      .setPrettyPrinting()
-	      .create();
-	}
+	private static final String SERVICE_NAME = "Get the last normalized messages from Artik Cloud.";
 	
 	/**
 	 * HTTP servlet for getting last normalized message
@@ -57,9 +39,54 @@ public class GetLastMessageService extends HttpServlet {
 	        throws ServletException, IOException {
 	  
 	  TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
-	  Response svcResponse = processRequestTemperature(httpRequest);
-	  String json = gson.toJson(svcResponse);
-		httpResponse.getWriter().print(json);
+	  try {
+      Response svcResponse = processRequest(httpRequest);
+      String json = Util.GSON.toJson(svcResponse);
+      httpResponse.getWriter().print(json);
+	  } catch (Exception e) {
+	    httpResponse.getWriter().println(e);
+	  }
+	}
+	
+	private static Response processRequest(HttpServletRequest httpRequest) {
+	  String servlet = httpRequest.getServletPath();
+	  
+	  String queryString = httpRequest.getRequestURL()
+	      .append("?")
+	      .append(httpRequest.getQueryString())
+	      .toString();
+	      
+	  Map<String, String[]> params = httpRequest.getParameterMap();
+	  
+	  Response.Builder response = Response.builder()
+          .status("Success")
+          .name(SERVICE_NAME)
+          .url(queryString);
+	  
+	  if (servlet.equals("/getLastMessage")) {
+      LastMessageRequestData requestData = new LastMessageRequestData(params);
+      MessageReturn messages = ArtikCloud.getLastMessage(
+          requestData.deviceGroup,
+          requestData.count);
+      
+      Set<ResponseGroup> responseGroupSet = processTemperature(messages);
+      
+      response.requestData(requestData)
+          .response(responseGroupSet);
+	  } else if (servlet.equals("/getMessage")) {
+	    MessageRequestData requestData = new MessageRequestData(params);
+	    MessageReturn messages = ArtikCloud.getMessage(
+	        requestData.deviceGroup,
+	        requestData.days, 
+	        requestData.hours,
+	        requestData.minutes);
+	    Set<ResponseGroup> responseGroupSet = processTemperature(messages);
+      
+	    response.requestData(requestData)
+          .response(responseGroupSet);
+	  }
+	  
+	  return response.build(); 
 	}
 	
 	/**
@@ -67,87 +94,62 @@ public class GetLastMessageService extends HttpServlet {
 	 * @param httpRequest
 	 * @return
 	 */
-	Response processRequestTemperature(HttpServletRequest httpRequest) {
-	  String queryString = httpRequest.getRequestURL()
-	      .append("?")
-	      .append(httpRequest.getQueryString())
-	      .toString();
-	      
-	  Map<String, String[]> params = httpRequest.getParameterMap();
-	  RequestData requestData = new RequestData(params);
-	  Map<Device, List<NormalizedMessage>> messages = ArtikCloud.getLastMessage(
-	      requestData.deviceGroup,
-	      requestData.count);
+	private static Set<ResponseGroup> processTemperature(MessageReturn messages) {
+	  List<MessageData> temperatureMessage = messages.getDeviceData(Device.TEMPERATURE);
+	  Set<DataGroup> dataGroupSet = getTemperatureData(temperatureMessage);
 	  
-	  List<NormalizedMessage> temperatureMessage = messages.get(Device.TEMPERATURE);
-	  
-	  DataGroup.Builder avgTemp = DataGroup.builder()
-	      .display("Average Temperature")
-	      .id("Average_Temperature");
-	  DataGroup.Builder bedTemp = DataGroup.builder()
-	      .display("Bedroom Temperature")
-	      .id("Bedroom_Temperature");
-	  DataGroup.Builder livTemp = DataGroup.builder()
-	      .display("Living Room Temperature")
-	      .id("Living_Room_Temperature");
-	  
-	  for (NormalizedMessage message : temperatureMessage) {
-	    Map<String, Object> messageData = message.getData();
-	    Long ts = message.getTs();
-	    Date date = new Date(ts);
-	    
-	    avgTemp.add(date, (Double) messageData.get("Average_Temperature"));
-	    bedTemp.add(date, (Double) messageData.get("Bedroom_Temperature"));
-	    livTemp.add(date, (Double) messageData.get("Living_Room_Temperature"));
-	  }
-	  
-	  Set<DataGroup> dataGroupSet = new HashSet<>();
-	  dataGroupSet.add(avgTemp.build());
-	  dataGroupSet.add(bedTemp.build());
-	  dataGroupSet.add(livTemp.build());
-	  
-	  
-	  List<NormalizedMessage> acMessage = messages.get(Device.AC);
-    
-    DataGroup.Builder ac = DataGroup.builder()
-        .display("AC")
-        .id("AC");
-    
-    for (NormalizedMessage message : acMessage) {
-      Map<String, Object> messageData = message.getData();
-      Long ts = message.getTs();
-      Date date = new Date(ts);
-      
-      ac.add(date, (String) messageData.get("state"));
-    }
-    
-    Set<DataGroup> acDataGroupSet = new HashSet<>();
-    acDataGroupSet.add(ac.build());
+	  List<MessageData> acMessage = messages.getDeviceData(Device.AC);
+	  Set<DataGroup> acDataGroupSet = getAcData(acMessage);
 	  
 	  Set<ResponseGroup> responseGroupSet = new HashSet<>();
-	  responseGroupSet.add(new ResponseGroup(Device.TEMPERATURE, dataGroupSet));
-	  responseGroupSet.add(new ResponseGroup(Device.AC, acDataGroupSet));
+	  responseGroupSet.add(
+	      new ResponseGroup(Device.TEMPERATURE, dataGroupSet, temperatureMessage));
+	  responseGroupSet.add(
+	      new ResponseGroup(Device.AC, acDataGroupSet, acMessage));
 	  
-	  Response response = Response.builder()
-	      .name(SERVICE_NAME)
-	      .requestData(requestData)
-	      .response(responseGroupSet)
-	      .status("Success")
-	      .url(queryString)
+	  return responseGroupSet;
+	}
+	
+	
+	private static Set<DataGroup> getTemperatureData(List<MessageData> temperatureMessage) {
+	  
+	  DataGroup avgTemp = DataGroup.builder()
+	      .display("Average Temperature")
+	      .id("Average_Temperature")
+	      .addAll(temperatureMessage, DeviceField.AVERAGE_TEMPERATURE)
+	      .build();
+	      
+	  DataGroup bedTemp = DataGroup.builder()
+	      .display("Bedroom Temperature")
+	      .id("Bedroom_Temperature")
+	      .addAll(temperatureMessage, DeviceField.BEDROOM_TEMPERATURE)
 	      .build();
 	  
-	  return response;
-	}
-	
-	static class RequestData {
-	  int count;
-	  DeviceGroup deviceGroup;
+	  DataGroup livTemp = DataGroup.builder()
+	      .display("Living Room Temperature")
+	      .id("Living_Room_Temperature")
+	      .addAll(temperatureMessage, DeviceField.LIVING_ROOM_TEMPERATURE)
+	      .build();
 	  
-	  RequestData(Map<String, String[]> params) {
-	    this.deviceGroup = DeviceGroup.valueOf(params.get("devicegroup")[0].toUpperCase());
-	    this.count = Integer.parseInt(params.get("count")[0]);
-	  }
+	  Set<DataGroup> dataGroupSet = new HashSet<>();
+	  dataGroupSet.add(avgTemp);
+	  dataGroupSet.add(bedTemp);
+	  dataGroupSet.add(livTemp);
+	  
+	  return dataGroupSet;
 	}
 	
+	private static Set<DataGroup> getAcData(List<MessageData> acMessage) {
+    DataGroup ac = DataGroup.builder()
+        .display("AC")
+        .id("AC")
+        .addAll(acMessage, DeviceField.STATE)
+        .build();
+    
+    Set<DataGroup> acDataGroupSet = new HashSet<>();
+    acDataGroupSet.add(ac);
+	 
+    return acDataGroupSet;
+	}
 	
 }
