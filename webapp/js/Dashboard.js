@@ -1,14 +1,12 @@
 'use strict'
 
-import ArtikCloud from './lib/ArtikCloud.js';
 import Devices from './lib/Devices.js';
 import Footer from './lib/Footer.js';
 import Header from './lib/Header.js';
 
-export default class Dashboard extends ArtikCloud {
+export default class Dashboard {
 
   constructor() {
-    super();
     this.footer = new Footer();
 
     this.header = new Header();
@@ -23,72 +21,39 @@ export default class Dashboard extends ArtikCloud {
     this.acStatusEl = this.el.querySelector("#ac-status");
     this.acPanelBody = this.acStatusEl.querySelector(".panel-body");
     this.tempOuterEl = this.tempStatusEl.querySelector(".outer-panel");
-    
-    this.url = window.location.origin + window.location.pathname;
-    this.temperatureUrl = this.url + 'getLastMessage?devicegroup=temperature' +
-        '&count=1';
-    
-    if (this.token != null || this.token != undefined) {
-      this.getData();
-    }
-    
+   
+    let protocol = document.location.protocol;
+    let hostname = document.location.hostname;
+    let host = document.location.host;
+
+    this.baseUrl = hostname == "localhost" ? 
+        host + '/smarthome-ws' :
+        host;
+
+    this.webServiceUrl = protocol + '//' + this.baseUrl + 
+        '/getLastMessage?devicegroup=temperature&count=1';
+   
+    this.webSocketUrl = 'ws://' + this.baseUrl + '/getLiveMessage';
+
+    this.getData();
   }
 
   getData() {
-    let promise = $.getJSON(this.temperatureUrl);
-    promise.done((usage) => {
-      let temperature = usage.response.find((response) => {
-        return response.device == 'TEMPERATURE';
-      });
-
-      let ac = usage.response.find((response) => {
-        return response.device == 'AC';
-      });
-
-      this.setTemp(temperature);
-      this.setAC(ac);
+    let promise = $.getJSON(this.webServiceUrl);
+    promise.done((result) => {
+      this.setTemperaturePanel(result);
+      this.setACPanel(result);
     });
    
-    /*
-    this.getLiveMessage(
-        this.devices.arduinoTemperature.did,
-        this.setTemperaturePanel);
-    */
-    /*
-    this.getLiveMessage(
-        this.devices.harmonyAC.did,
-        this.setACPanel);
-    */
+    this.getLiveMessage(this.devices.temperature.id, this.setTemperaturePanel);
+    this.getLiveMessage(this.devices.ac.id, this.setACPanel);
   }
   
-  setACPanel(response, isLive = false) {
-    let data;
-    let ts;
-    if (isLive){
-      data = response.data;
-      ts = response.ts;
-    }else{
-      let metadata = response.data[0];
-      data = metadata.data;
-      ts = metadata.ts;
-    }
- 
-    let date = new Date(ts).toLocaleDateString();
-    let time = new Date(ts).toLocaleTimeString();
-    let state = data.state.toUpperCase(); 
+  setACPanel(result) {
+    let response = result.response.find((response) => {
+      return response.device == 'AC';
+    });
 
-    d3.select(this.acStatusEl)
-        .classed("hidden", false)
-        .select(".panel-body")
-        .text(state)
-    
-    d3.select(this.acStatusEl)
-        .select(".panel-footer")
-        .text("Last Updated: " + time + " on " + date);
-
-  }
- 
-  setAC(response) {
     d3.select(this.acStatusEl)
         .classed('hidden', false)
         .select('.panel-body')
@@ -99,7 +64,11 @@ export default class Dashboard extends ArtikCloud {
         .text('Last Updated: ' + response.date[0]);
   }
 
-  setTemp(response) {
+  setTemperaturePanel(result) {
+    let response = result.response.find((response) => {
+      return response.device == 'TEMPERATURE';
+    });
+
     d3.select(this.tempStatusEl)
         .classed('hidden', false);
 
@@ -113,49 +82,34 @@ export default class Dashboard extends ArtikCloud {
         .select('.panel-footer')
         .text('Last Updated: ' + response.date[0]);
   }
-  
-  setTemperaturePanel(response, isLive = false) {
-    let data;
-    let ts;
-    if (isLive){
-      data = response.data;
-      ts = response.ts;
-    }else{
-      let metadata = response.data[0];
-      data = metadata.data;
-      ts = metadata.ts;
+
+  getLiveMessage(device, callback) {
+    let url = this.webSocketUrl + '?device=' + device;
+    let ws = new WebSocket(url);
+
+    ws.onopen = () => {
+      console.log('Connected');
+    };
+
+    ws.onclose = () => {
+      console.log('Closed');
     }
-    
-    let date = new Date(ts).toLocaleDateString();
-    let time = new Date(ts).toLocaleTimeString();
-   
-    let temp = [
-      [this.avgTempEl, data.Average_Temperature],
-      [this.bedroomTempEl, data.Bedroom_Temperature],
-      [this.livingRoomTempEl, data.Living_Room_Temperature]
-    ];
 
-    d3.select(this.tempStatusEl)
-        .classed("hidden", false)
-        .selectAll(".temp")
-        .select(function(d,i){return temp[i][0];})
-        .html(function(d,i){
-          return temp[i][1] + "℉ "; 
-        });
-    
-    d3.select(this.tempStatusEl)
-        .select(".panel-footer")
-        .text("Last Updated: " + time + " on " + date);
-    
-    let height = this.tempOuterEl.clientHeight;
-    d3.select(this.acPanelBody)
-        .style("height", height + "px");
-  }
+    ws.onerror = () => {
+      console.log('Websockets Error')
+    };
 
-  printResponse(response) {
-    console.log("Response:");
-    console.log(response);
+    ws.onmessage = (response) => {
+      let data = JSON.parse(response.data);
+      let status = data.status;
 
+      if (status == "Success") {
+        console.log('Web Sockets On Message:');
+        console.log(data);
+        this._liveCallback = callback;
+        this._liveCallback(data);
+      }
+    };
   }
 
 }
