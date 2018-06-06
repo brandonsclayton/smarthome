@@ -62,4 +62,8 @@ public class Response {
     }
     
   }
+  
+  public String toJsonString() {
+    return Util.GSON.toJson(this, Response.class);
+  }
 }
