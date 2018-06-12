@@ -41,7 +41,7 @@ public class GetLastMessageService extends HttpServlet {
 	  TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
 	  try {
       Response svcResponse = processRequest(httpRequest);
-      String json = Util.GSON.toJson(svcResponse);
+      String json = svcResponse.toJsonString();
       httpResponse.getWriter().print(json);
 	  } catch (Exception e) {
 	    httpResponse.getWriter().println(e);
@@ -63,7 +63,7 @@ public class GetLastMessageService extends HttpServlet {
           .name(SERVICE_NAME)
           .url(queryString);
 	  
-	  if (servlet.equals("/getLastMessage")) {
+	  if ("/getLastMessage".equals(servlet)) {
       LastMessageRequestData requestData = new LastMessageRequestData(params);
       MessageReturn messages = ArtikCloud.getLastMessage(
           requestData.deviceGroup,
@@ -73,7 +73,7 @@ public class GetLastMessageService extends HttpServlet {
       
       response.requestData(requestData)
           .response(responseGroupSet);
-	  } else if (servlet.equals("/getMessage")) {
+	  } else if ("/getMessage".equals(servlet)) {
 	    MessageRequestData requestData = new MessageRequestData(params);
 	    MessageReturn messages = ArtikCloud.getMessage(
 	        requestData.deviceGroup,

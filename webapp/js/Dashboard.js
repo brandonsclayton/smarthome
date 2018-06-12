@@ -35,20 +35,71 @@ export default class Dashboard {
    
     this.webSocketUrl = 'ws://' + this.baseUrl + '/getLiveMessage';
 
-    this.getData();
+    this.getLastMessage();
+
+    let tempWebSocket = this.getLiveMessage(
+      this.devices.temperature.id,
+      this.setTemperaturePanel);
+    
+    let acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+
+    document.addEventListener("visibilitychange", (event) => {
+      if (document.hidden) {
+        console.log('Hidden')
+        tempWebSocket.close();
+        acWebSocket.close();
+      } else {
+        console.log('Visible');
+        this.getLastMessage();
+
+        tempWebSocket = this.getLiveMessage(
+          this.devices.temperature.id,
+          this.setTemperaturePanel);
+
+        acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+      }
+    });
   }
 
-  getData() {
+  getLastMessage() {
     let promise = $.getJSON(this.webServiceUrl);
     promise.done((result) => {
       this.setTemperaturePanel(result);
       this.setACPanel(result);
     });
-   
-    this.getLiveMessage(this.devices.temperature.id, this.setTemperaturePanel);
-    this.getLiveMessage(this.devices.ac.id, this.setACPanel);
   }
   
+  getLiveMessage(device, callback) {
+    let url = this.webSocketUrl + '?device=' + device;
+    let ws = new WebSocket(url);
+
+    ws.onopen = () => {
+      console.log('Web sockets connected to ' + device);
+    };
+
+    ws.onclose = () => {
+      console.log('Web sockets closed ' + device);
+    }
+
+    ws.onerror = () => {
+      console.log('Websockets Error for ' + device)
+    };
+
+    ws.onmessage = (response) => {
+      let data = JSON.parse(response.data);
+      let status = data.status;
+
+      if (status == 'success') {
+        console.log('Web Sockets On Message:');
+        console.log(data);
+        this._liveCallback = callback;
+        this._liveCallback(data);
+      } 
+    };
+
+    return ws;
+  }
+
   setACPanel(result) {
     let response = result.response.find((response) => {
       return response.device == 'AC';
@@ -81,35 +132,6 @@ export default class Dashboard {
     d3.select(this.tempStatusEl)
         .select('.panel-footer')
         .text('Last Updated: ' + response.date[0]);
-  }
-
-  getLiveMessage(device, callback) {
-    let url = this.webSocketUrl + '?device=' + device;
-    let ws = new WebSocket(url);
-
-    ws.onopen = () => {
-      console.log('Connected');
-    };
-
-    ws.onclose = () => {
-      console.log('Closed');
-    }
-
-    ws.onerror = () => {
-      console.log('Websockets Error')
-    };
-
-    ws.onmessage = (response) => {
-      let data = JSON.parse(response.data);
-      let status = data.status;
-
-      if (status == "Success") {
-        console.log('Web Sockets On Message:');
-        console.log(data);
-        this._liveCallback = callback;
-        this._liveCallback(data);
-      }
-    };
   }
 
 }

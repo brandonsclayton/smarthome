@@ -1,5 +1,6 @@
 package com.clayton.smarthome;
 
+import java.util.List;
 import java.util.Map;
 
 public class RequestData {
@@ -38,7 +39,15 @@ public class RequestData {
   static class LiveMessageRequestData extends RequestData {
     Device device;
     
-    LiveMessageRequestData(Map<String, String[]> httpParams) {
+    LiveMessageRequestData(Map<String, List<String>> httpParams) {
+      this.device = Device.valueOf(httpParams.get(Key.DEVICE).get(0).toUpperCase());
+    }
+  }
+  
+  static class MessageStatsRequestData extends RequestData {
+    Device device;
+    
+    MessageStatsRequestData(Map<String, String[]> httpParams) {
       this.device = Device.valueOf(httpParams.get(Key.DEVICE)[0].toUpperCase());
     }
   }
@@ -51,5 +60,6 @@ public class RequestData {
     private static final String MINUTES = "minutes";
     private static final String HOURS = "hours";
   }
+  
 
 }
