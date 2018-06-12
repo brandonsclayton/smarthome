@@ -1,10 +1,7 @@
 package com.clayton.smarthome;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,13 +19,10 @@ import cloud.artik.client.ApiClient;
 import cloud.artik.client.ApiException;
 import cloud.artik.client.Configuration;
 import cloud.artik.client.auth.OAuth;
-import cloud.artik.model.Acknowledgement;
-import cloud.artik.model.ActionOut;
 import cloud.artik.model.AggregateData;
 import cloud.artik.model.AggregatesResponse;
 import cloud.artik.model.MessageOut;
 import cloud.artik.model.NormalizedMessagesEnvelope;
-import cloud.artik.model.WebSocketError;
 import cloud.artik.websocket.ArtikCloudWebSocketCallback;
 import cloud.artik.websocket.FirehoseWebSocket;
 
@@ -139,7 +133,10 @@ public class ArtikCloud {
     } 
   }
   
-  public static FirehoseWebSocket getLiveMessage(Device device, ArtikCloudLiveCallback callback) {
+  public static FirehoseWebSocket getLiveMessage(
+      Device device, 
+      ArtikCloudWebSocketCallback callback) {
+
     try {
       FirehoseWebSocket ws = new FirehoseWebSocket(
           device.deviceToken,
@@ -147,7 +144,7 @@ public class ArtikCloud {
           null,
           null,
           null,
-          new LiveCallback(device, callback));
+          callback);
       
       ws.connect();
       
@@ -159,54 +156,54 @@ public class ArtikCloud {
   }
   
 
-  private static class LiveCallback implements ArtikCloudWebSocketCallback {
-    Device device;
-    ArtikCloudLiveCallback callback;
-    
-    private LiveCallback(Device device, ArtikCloudLiveCallback callback) {
-      this.device = device;
-      this.callback = callback;
-    }
-    
-    @Override
-    public void onOpen(int httpStatus, String httpStatusMessage) {
-      this.callback.onOpen(httpStatus, httpStatusMessage);
-    }
-
-    @Override
-    public void onMessage(MessageOut liveMessage) {
-      MessageReturn results = MessageReturn.builder()
-          .put(device, liveMessage)
-          .build();
-      this.callback.onMessage(results);
-    }
-
-    @Override
-    public void onAction(ActionOut action) {
-      System.out.println(String.format("Received action:[%s]", action));
-    }
-
-    @Override
-    public void onAck(Acknowledgement ack) {
-      System.out.println(String.format("Received Ack [%s]", ack));
-    }
-
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
-      this.callback.onClose(code, reason, remote);
-    }
-
-    @Override
-    public void onError(WebSocketError error) {
-      this.callback.onError(error);
-    }
-
-    @Override
-    public void onPing(long timestamp) {
-      this.callback.onPing(timestamp);
-    }
-  
-  }
+//  private static class LiveCallback implements ArtikCloudWebSocketCallback {
+//    Device device;
+//    ArtikCloudLiveCallback callback;
+//    
+//    private LiveCallback(Device device, ArtikCloudLiveCallback callback) {
+//      this.device = device;
+//      this.callback = callback;
+//    }
+//    
+//    @Override
+//    public void onOpen(int httpStatus, String httpStatusMessage) {
+//      this.callback.onOpen(httpStatus, httpStatusMessage);
+//    }
+//
+//    @Override
+//    public void onMessage(MessageOut liveMessage) {
+//      MessageReturn results = MessageReturn.builder()
+//          .put(device, liveMessage)
+//          .build();
+//      this.callback.onMessage(results);
+//    }
+//
+//    @Override
+//    public void onAction(ActionOut action) {
+//      System.out.println(String.format("Received action:[%s]", action));
+//    }
+//
+//    @Override
+//    public void onAck(Acknowledgement ack) {
+//      System.out.println(String.format("Received Ack [%s]", ack));
+//    }
+//
+//    @Override
+//    public void onClose(int code, String reason, boolean remote) {
+//      this.callback.onClose(code, reason, remote);
+//    }
+//
+//    @Override
+//    public void onError(WebSocketError error) {
+//      this.callback.onError(error);
+//    }
+//
+//    @Override
+//    public void onPing(long timestamp) {
+//      this.callback.onPing(timestamp);
+//    }
+//  
+//  }
   
   public static class AggregateMessageData {
     String deviceField;
@@ -308,18 +305,18 @@ public class ArtikCloud {
       return Util.GSON.toJson(this, MessageReturn.class);
     }
 
-    private static Builder builder() {
+    static Builder builder() {
       return new Builder();
     }
     
-    private static class Builder {
+    static class Builder {
       private Map<Device, List<MessageData>> results = new HashMap<>();
       
-      private MessageReturn build() {
+      MessageReturn build() {
         return new MessageReturn(this);
       }
       
-      private Builder put(Device device, List<NormalizedMessagesEnvelope> messages) {
+      Builder put(Device device, List<NormalizedMessagesEnvelope> messages) {
         List<MessageData> data = new ArrayList<>();
         
         for (NormalizedMessagesEnvelope message : messages) {
@@ -332,7 +329,7 @@ public class ArtikCloud {
         return this;
       }
       
-      private Builder put(Device device, MessageOut liveMessage) {
+      Builder put(Device device, MessageOut liveMessage) {
         List<MessageData> data = Arrays.asList(
             new MessageData(liveMessage.getTs(), liveMessage.getData()));
         
