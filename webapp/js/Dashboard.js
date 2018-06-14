@@ -47,28 +47,28 @@ export default class Dashboard {
 
     this.getLastMessage();
 
-    // let tempWebSocket = this.getLiveMessage(
-    //   this.devices.temperature.id,
-    //   this.setTemperaturePanel);
+    let tempWebSocket = this.getLiveMessage(
+      this.devices.temperature.id,
+      this.setTemperaturePanel);
     
-    // let acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+    let acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
 
-    // document.addEventListener("visibilitychange", (event) => {
-    //   if (document.hidden) {
-    //     console.log('Hidden')
-    //     tempWebSocket.close();
-    //     acWebSocket.close();
-    //   } else {
-    //     console.log('Visible');
-    //     this.getLastMessage();
+    document.addEventListener("visibilitychange", (event) => {
+      if (document.hidden) {
+        console.log('Hidden')
+        tempWebSocket.close();
+        acWebSocket.close();
+      } else {
+        console.log('Visible');
+        this.getLastMessage();
 
-    //     tempWebSocket = this.getLiveMessage(
-    //       this.devices.temperature.id,
-    //       this.setTemperaturePanel);
+        tempWebSocket = this.getLiveMessage(
+          this.devices.temperature.id,
+          this.setTemperaturePanel);
 
-    //     acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
-    //   }
-    // });
+        acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+      }
+    });
   }
 
   getMessageStats() {
