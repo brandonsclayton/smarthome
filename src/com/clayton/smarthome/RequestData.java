@@ -46,9 +46,19 @@ public class RequestData {
   
   static class MessageStatsRequestData extends RequestData {
     Device device;
+    int days;
+    int hours;
+    int minutes;
     
     MessageStatsRequestData(Map<String, String[]> httpParams) {
       this.device = Device.valueOf(httpParams.get(Key.DEVICE)[0].toUpperCase());
+      String[] days = httpParams.get(Key.DAYS);
+      String[] hours = httpParams.get(Key.HOURS);
+      String[] minutes = httpParams.get(Key.MINUTES);
+      
+      this.days = days == null ? 0 : Integer.parseInt(days[0]);
+      this.hours = hours == null ? 0 : Integer.parseInt(hours[0]); 
+      this.minutes = minutes == null ? 0 : Integer.parseInt(minutes[0]); 
     }
   }
   

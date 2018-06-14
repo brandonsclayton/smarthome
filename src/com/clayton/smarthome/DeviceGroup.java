@@ -7,13 +7,19 @@ import com.google.common.collect.Sets;
 public enum DeviceGroup implements Iterable<Device>{
 
   TEMPERATURE(
+      "Temperature Group",
+      "temperatureGroup",
       Sets.newHashSet(
           Device.TEMPERATURE,
           Device.AC));
+ 
+  final String label;
+  final String id;
+  final Set<Device> devices;
   
-  Set<Device> devices;
-  
-  private DeviceGroup(Set<Device> devices) {
+  private DeviceGroup(String label, String id, Set<Device> devices) {
+    this.label = label;
+    this.id = id;
     this.devices = devices;
   }
 

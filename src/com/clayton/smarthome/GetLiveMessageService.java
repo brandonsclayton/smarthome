@@ -16,8 +16,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.clayton.smarthome.ArtikCloud.MessageData;
 import com.clayton.smarthome.ArtikCloud.MessageReturn;
+import com.clayton.smarthome.LastMessageResponseGroup;
 import com.clayton.smarthome.RequestData.LiveMessageRequestData;
 
 import cloud.artik.model.Acknowledgement;
@@ -100,29 +100,14 @@ public class GetLiveMessageService {
           .put(requestData.device, liveMessage)
           .build();
       
-      Set<DataGroup> dataGroupSet = new HashSet<>();
-      Set<ResponseGroup> responseGroupSet = new HashSet<>();
-      List<MessageData> messageData = messageReturn.getDeviceData(requestData.device);
+      LastMessageResponseGroup responseGroup = new LastMessageResponseGroup(messageReturn);
       
-      for (DeviceField deviceField : requestData.device.deviceFields) {
-        DataGroup dataGroup = DataGroup.builder()
-            .display(deviceField.display)
-            .id(deviceField.id)
-            .addAll(messageData, deviceField)
-            .build();
-        
-        dataGroupSet.add(dataGroup);
-      }
-      
-      responseGroupSet.add(
-          new ResponseGroup(requestData.device, dataGroupSet, messageData));
-      
-      Response response = Response.builder()
+      GetLastMessageResponse response = GetLastMessageResponse.builder()
           .name(SERVICE_NAME)
           .status("success")
           .url(url)
           .requestData(requestData)
-          .response(responseGroupSet)
+          .response(responseGroup)
           .build();
      
        sendMessage(session, response.toJsonString());
