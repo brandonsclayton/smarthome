@@ -1,13 +1,15 @@
 package com.clayton.smarthome;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-public enum Device {
+public enum Device implements Iterable<DeviceField> {
   
   AC(
       "AC",
+      "ac",
       "22190f84bb0845e5a571ab17269f88a4",
       "6519448711e0448db33b8b17565cebd9",
       Sets.newHashSet(DeviceField.STATE),
@@ -16,6 +18,7 @@ public enum Device {
   
   TEMPERATURE(
       "Temperature",
+      "temperature",
       "1497d25089db4a8d84997fd5b2a3d65f",
       "17d85311bc7f46519a75a5138c46f221",
       Sets.newHashSet(
@@ -26,6 +29,7 @@ public enum Device {
       "Temperature");
   
   String label;
+  String id;
   String deviceId;
   String deviceToken;
   Set<DeviceField> deviceFields;
@@ -34,17 +38,24 @@ public enum Device {
   
   private Device(
       String label,
+      String id,
       String deviceId, 
       String deviceToken, 
       Set<DeviceField> deviceFields,
       String xLabel, 
       String yLabel) {
     this.label = label;
+    this.id = id;
     this.deviceId = deviceId;
     this.deviceToken = deviceToken;
     this.deviceFields = deviceFields;
     this.xLabel = xLabel;
     this.yLabel = yLabel;
+  }
+
+  @Override
+  public Iterator<DeviceField> iterator() {
+    return deviceFields.iterator();
   }
 
 }

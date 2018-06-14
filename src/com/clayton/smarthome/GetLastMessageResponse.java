@@ -2,16 +2,17 @@ package com.clayton.smarthome;
 
 import java.util.Set;
 
+import com.clayton.smarthome.LastMessageResponseGroup.LastMessageResponse;
 import com.clayton.smarthome.RequestData;
 
-public class Response {
+public class GetLastMessageResponse {
   String name;
   String status;
   String url;
   RequestData request;
-  Set<ResponseGroup> response;
+  Set<LastMessageResponse> response;
   
-  private Response(Builder builder) {
+  private GetLastMessageResponse(Builder builder) {
     this.name = builder.name;
     this.status = builder.status;
     this.url = builder.url;
@@ -19,6 +20,10 @@ public class Response {
     this.response = builder.response;
   }
   
+  public String toJsonString() {
+    return Util.GSON.toJson(this, GetLastMessageResponse.class);
+  }
+
   static Builder builder() {
     return new Builder();
   }
@@ -28,12 +33,12 @@ public class Response {
     private String status;
     private String url;
     private RequestData request;
-    private Set<ResponseGroup> response;
+    private Set<LastMessageResponse> response;
     
     private Builder() {}
   
-    Response build() {
-      return new Response(this);
+    GetLastMessageResponse build() {
+      return new GetLastMessageResponse(this);
     }
     
     Builder name(String name) {
@@ -56,14 +61,11 @@ public class Response {
       return this;
     }
     
-    Builder response(Set<ResponseGroup> response) {
-      this.response = response;
+    Builder response(LastMessageResponseGroup responseGroup) {
+      this.response = responseGroup.response;
       return this;
     }
     
   }
   
-  public String toJsonString() {
-    return Util.GSON.toJson(this, Response.class);
-  }
 }

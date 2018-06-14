@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -107,17 +108,19 @@ public class ArtikCloud {
       throw new RuntimeException();
     }
   }
-  
-  public static AggregateMessageReturn getMessageStats(Device device) {
-    MessagesApi apiInstance = new MessagesApi();
-    Long endDate = Instant.now().toEpochMilli(); 
-    Long startDate =  endDate - TimeUnit.DAYS.toMillis(1);
+ 
+  public static AggregateMessageReturn getMessageStats(
+      Device device, 
+      long startDate, 
+      long endDate) {
     
+    MessagesApi apiInstance = new MessagesApi();
     OAUTH.setAccessToken(device.deviceToken);
     String sdid = device.deviceId; 
     AggregateMessageReturn.Builder messageReturn = AggregateMessageReturn.builder();
+    
     try {
-      for (DeviceField deviceField : device.deviceFields) {
+      for (DeviceField deviceField : device) {
         AggregatesResponse response = apiInstance.getMessageAggregates(
             sdid, /* Device id */
             deviceField.id,  /* data field */
@@ -131,6 +134,22 @@ public class ArtikCloud {
     } catch (ApiException e) {
       throw new RuntimeException();
     } 
+  }
+  
+  public static AggregateMessageReturn getMessageStats(
+      Device device,
+      int days,
+      int hours,
+      int minutes) {
+    
+    long past = TimeUnit.DAYS.toMillis(days) + 
+        TimeUnit.HOURS.toMillis(hours) + 
+        TimeUnit.MINUTES.toMillis(minutes);
+
+    long endDate = Instant.now().toEpochMilli();
+    long startDate = endDate - past;
+    
+    return getMessageStats(device, startDate, endDate);
   }
   
   public static FirehoseWebSocket getLiveMessage(
@@ -155,68 +174,18 @@ public class ArtikCloud {
     }
   }
   
-
-//  private static class LiveCallback implements ArtikCloudWebSocketCallback {
-//    Device device;
-//    ArtikCloudLiveCallback callback;
-//    
-//    private LiveCallback(Device device, ArtikCloudLiveCallback callback) {
-//      this.device = device;
-//      this.callback = callback;
-//    }
-//    
-//    @Override
-//    public void onOpen(int httpStatus, String httpStatusMessage) {
-//      this.callback.onOpen(httpStatus, httpStatusMessage);
-//    }
-//
-//    @Override
-//    public void onMessage(MessageOut liveMessage) {
-//      MessageReturn results = MessageReturn.builder()
-//          .put(device, liveMessage)
-//          .build();
-//      this.callback.onMessage(results);
-//    }
-//
-//    @Override
-//    public void onAction(ActionOut action) {
-//      System.out.println(String.format("Received action:[%s]", action));
-//    }
-//
-//    @Override
-//    public void onAck(Acknowledgement ack) {
-//      System.out.println(String.format("Received Ack [%s]", ack));
-//    }
-//
-//    @Override
-//    public void onClose(int code, String reason, boolean remote) {
-//      this.callback.onClose(code, reason, remote);
-//    }
-//
-//    @Override
-//    public void onError(WebSocketError error) {
-//      this.callback.onError(error);
-//    }
-//
-//    @Override
-//    public void onPing(long timestamp) {
-//      this.callback.onPing(timestamp);
-//    }
-//  
-//  }
-  
   public static class AggregateMessageData {
-    String deviceField;
+    DeviceField deviceField;
     Long count;
-    double max;
     double min;
+    double max;
     double mean;
     
     AggregateMessageData(DeviceField deviceField, AggregateData response) {
-      this.deviceField = deviceField.id;
+      this.deviceField = deviceField;
       this.count = response.getCount();
-      this.max = Math.round(response.getMax() * 100.0) / 100.0;
       this.min = Math.round(response.getMin() * 100.0) / 100.0;
+      this.max = Math.round(response.getMax() * 100.0) / 100.0;
       this.mean = Math.round(response.getMean() * 100.0) / 100.0;
     }
     
@@ -235,6 +204,13 @@ public class ArtikCloud {
     
     public List<AggregateMessageData> getData() {
       return results;
+    }
+    
+    public AggregateMessageData getDeviceFieldData(DeviceField deviceField) {
+      return results.stream()
+          .filter(data -> data.deviceField.id == deviceField.id)
+          .findFirst()
+          .orElse(null);
     }
    
     @Override
@@ -299,6 +275,10 @@ public class ArtikCloud {
     
     public Map<Device, List<MessageData>> getData() {
       return results;
+    }
+   
+    public Set<Device> getDevices() {
+      return results.keySet();
     }
     
     public String toJsonString() {

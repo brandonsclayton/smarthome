@@ -3,6 +3,7 @@
 import Devices from './lib/Devices.js';
 import Footer from './lib/Footer.js';
 import Header from './lib/Header.js';
+import Tools from './lib/Tools.js';
 
 export default class Dashboard {
 
@@ -21,6 +22,12 @@ export default class Dashboard {
     this.acStatusEl = this.el.querySelector("#ac-status");
     this.acPanelBody = this.acStatusEl.querySelector(".panel-body");
     this.tempOuterEl = this.tempStatusEl.querySelector(".outer-panel");
+
+    this.tempStatsEl = this.el.querySelector('#temperature-stats');
+    this.meanTempEl = this.tempStatsEl.querySelector('#mean');
+    this.minTempEl = this.tempStatsEl.querySelector('#min');
+    this.maxTempEl = this.tempStatsEl.querySelector('#max');
+    this.statsRoomSelectEl = this.tempStatsEl.querySelector('#room-select');
    
     let protocol = document.location.protocol;
     let hostname = document.location.hostname;
@@ -30,42 +37,68 @@ export default class Dashboard {
         host + '/smarthome-ws' :
         host;
 
-    this.webServiceUrl = protocol + '//' + this.baseUrl + 
+    this.getLastMessageUrl = protocol + '//' + this.baseUrl + 
         '/getLastMessage?devicegroup=temperature&count=1';
-   
+  
+    this.getTemperatureStatsUrl = protocol + '//' + this.baseUrl + 
+        '/getLastMessageStats?device=temperature&days=1';
+
     this.webSocketUrl = 'ws://' + this.baseUrl + '/getLiveMessage';
 
     this.getLastMessage();
 
-    let tempWebSocket = this.getLiveMessage(
-      this.devices.temperature.id,
-      this.setTemperaturePanel);
+    // let tempWebSocket = this.getLiveMessage(
+    //   this.devices.temperature.id,
+    //   this.setTemperaturePanel);
     
-    let acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+    // let acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
 
-    document.addEventListener("visibilitychange", (event) => {
-      if (document.hidden) {
-        console.log('Hidden')
-        tempWebSocket.close();
-        acWebSocket.close();
-      } else {
-        console.log('Visible');
-        this.getLastMessage();
+    // document.addEventListener("visibilitychange", (event) => {
+    //   if (document.hidden) {
+    //     console.log('Hidden')
+    //     tempWebSocket.close();
+    //     acWebSocket.close();
+    //   } else {
+    //     console.log('Visible');
+    //     this.getLastMessage();
 
-        tempWebSocket = this.getLiveMessage(
-          this.devices.temperature.id,
-          this.setTemperaturePanel);
+    //     tempWebSocket = this.getLiveMessage(
+    //       this.devices.temperature.id,
+    //       this.setTemperaturePanel);
 
-        acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+    //     acWebSocket = this.getLiveMessage(this.devices.ac.id, this.setACPanel);
+    //   }
+    // });
+  }
+
+  getMessageStats() {
+    let jsonCall = Tools.getJSON(this.getTemperatureStatsUrl);
+
+    jsonCall.promise.then((result) => {
+      this.setStatSelectMenu(result);
+    }).catch((errorMessage) => {
+      try {
+        throw new Error(errorMessage);
+      } catch(err) {
+        console.error(errorMessage);
       }
     });
   }
-
+  
   getLastMessage() {
-    let promise = $.getJSON(this.webServiceUrl);
-    promise.done((result) => {
-      this.setTemperaturePanel(result);
-      this.setACPanel(result);
+    let jsonCall = Tools.getJSON(this.getLastMessageUrl);
+
+    jsonCall.promise.then((result) => {
+      this.setTemperaturePanel(result.response);
+      this.setACPanel(result.response);
+
+      this.getMessageStats();
+    }).catch((errorMessage) => {
+      try {
+        throw new Error(errorMessage);
+      } catch(err) {
+        console.error(errorMessage);
+      }
     });
   }
   
@@ -100,38 +133,84 @@ export default class Dashboard {
     return ws;
   }
 
-  setACPanel(result) {
-    let response = result.response.find((response) => {
-      return response.device == 'AC';
+  setACPanel(responses) {
+    let acResponse = responses.find((response) => {
+      return response.device.id == 'ac';
     });
 
     d3.select(this.acStatusEl)
         .classed('hidden', false)
         .select('.panel-body')
-        .text(response.dataGroup[0].data[0].toUpperCase());
+        .text(acResponse.dataGroup[0].data[0].toUpperCase());
 
     d3.select(this.acStatusEl)
         .select('.panel-footer')
-        .text('Last Updated: ' + response.date[0]);
+        .text('Last Updated: ' + acResponse.date[0]);
   }
 
-  setTemperaturePanel(result) {
-    let response = result.response.find((response) => {
-      return response.device == 'TEMPERATURE';
+  setTemperaturePanel(responses) {
+    let tempResponse = responses.find((response) => {
+      return response.device.id == 'temperature';
     });
 
     d3.select(this.tempStatusEl)
         .classed('hidden', false);
 
-    for (let d of response.dataGroup) {
+    for (let dataGroup of tempResponse.dataGroup) {
       d3.select(this.tempStatusEl)
-          .select('#' + d.id)
-          .html(d.data[0] + '℉ '); 
+          .select('#' + dataGroup.deviceField.id)
+          .html(dataGroup.data[0] + '℉ '); 
     }
 
     d3.select(this.tempStatusEl)
         .select('.panel-footer')
-        .text('Last Updated: ' + response.date[0]);
+        .text('Last Updated: ' + tempResponse.date[0]);
+  }
+
+  setStatsPanel(result, deviceField) {
+    let avgResponse = result.response.find((response) => {
+      return response.deviceField.id == deviceField; 
+    });
+
+    d3.select(this.tempStatsEl)
+        .classed('hidden', false);
+
+    d3.select(this.meanTempEl)
+        .html(avgResponse.mean + '℉')
+    
+    d3.select(this.minTempEl)
+        .html(avgResponse.min + '℉')
+    
+    d3.select(this.maxTempEl)
+        .html(avgResponse.max + '℉')
+    
+    d3.select(this.tempStatsEl)
+        .select('.panel-footer')
+        .text('Last Updated: ' + result.date);
+  }
+
+  setStatSelectMenu(result) {
+    d3.select(this.statsRoomSelectEl)
+        .selectAll('option')
+        .data(result.response)
+        .enter()
+        .append('option')
+        .attr('value', (d) => { return d.deviceField.id; })
+        .text((d) => { return d.deviceField.label; });
+    
+    let defaultValue = 'Average_Temperature';
+    this.statsRoomSelectEl.value = defaultValue;
+    this.setStatsPanel(result, defaultValue);
+
+    this.statsRoomSelectEl.addEventListener('change',() => { 
+      this.onRoomChange(result); 
+    });
+
+  }
+
+  onRoomChange(result) {
+    let value = event.target.value;
+    this.setStatsPanel(result, value);
   }
 
 }
