@@ -9,6 +9,7 @@
   left: 0;
   margin: 1.75em 0 2.25em 0;
   padding: 20px;
+  overflow: scroll;
 }
 
 #dash {
