@@ -6,6 +6,17 @@
   id="smarthome-ws" version="3.0">
 
   <display-name>smarthome-ws</display-name>
+  <servlet>
+  	<description>
+  	</description>
+  	<display-name>ToggleACService</display-name>
+  	<servlet-name>ToggleACService</servlet-name>
+  	<servlet-class>com.clayton.smarthome.ToggleACService</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>ToggleACService</servlet-name>
+  	<url-pattern>/ToggleACService</url-pattern>
+  </servlet-mapping>
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
