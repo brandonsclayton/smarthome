@@ -22,6 +22,8 @@ import cloud.artik.client.Configuration;
 import cloud.artik.client.auth.OAuth;
 import cloud.artik.model.AggregateData;
 import cloud.artik.model.AggregatesResponse;
+import cloud.artik.model.Message;
+import cloud.artik.model.MessageIDEnvelope;
 import cloud.artik.model.MessageOut;
 import cloud.artik.model.NormalizedMessagesEnvelope;
 import cloud.artik.websocket.ArtikCloudWebSocketCallback;
@@ -35,6 +37,21 @@ public class ArtikCloud {
   
   static {
     API_CLIENT.setDebugging(false);
+  }
+ 
+  public static MessageIDEnvelope postMessage(Device device, Map<String, Object> messageData) {
+    OAUTH.setAccessToken(device.deviceToken);
+    MessagesApi messageApi = new MessagesApi();
+    Message message = new Message();
+    message.setSdid(device.deviceId);
+    message.setData(messageData);
+    
+    try {
+      return messageApi.sendMessage(message);
+    } catch (ApiException e) {
+      e.printStackTrace();
+      throw new RuntimeException();
+    }
   }
   
   public static MessageReturn getLastMessage(DeviceGroup deviceGroup, int count) {
