@@ -1,0 +1,52 @@
+
+/*................... Spinner .......................*/
+
+.Spinner {
+  display: flex !important;
+}
+
+.Spinner .modal-dialog {
+  margin: auto;
+  width: auto;
+}
+
+.Spinner .spinner-text {
+  font-size: 1.5em;
+  padding: 1em 0 0 0;
+  margin: 0;
+}
+
+.Spinner .modal-content {
+  height: auto;
+  width: 12em;
+}
+
+.Spinner .modal-content {
+  text-align: center;
+}
+
+.Spinner .modal-footer {
+  text-align: center;
+}
+
+.Spinner .loading-spinner {
+  margin: 0.25em auto;
+  border: 0.7em solid #E0E0E0;
+  border-radius: 50%;
+  border-top: 0.7em solid #337ab7;
+  width: 4em;
+  height: 4em;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/*-------------- End: Spinner -----------------------*/

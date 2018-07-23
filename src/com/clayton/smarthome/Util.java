@@ -34,6 +34,7 @@ static final DateTimeFormatter DATE_FMT = DateTimeFormatter
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "*");
     response.setHeader("Access-Control-Allow-Headers", "accept,origin,authorization,content-type");
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
   }
   
   private static final class DeviceGroupSerializer implements JsonSerializer<DeviceGroup> {

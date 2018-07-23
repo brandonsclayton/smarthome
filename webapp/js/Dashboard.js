@@ -4,12 +4,13 @@ import Devices from './lib/Devices.js';
 import Footer from './lib/Footer.js';
 import Header from './lib/Header.js';
 import Tools from './lib/Tools.js';
+import Spinner from './lib/Spinner.js';
 
 export default class Dashboard {
 
   constructor() {
+    this.spinner = new Spinner();
     this.footer = new Footer();
-
     this.header = new Header();
     this.header.setTitle("Dashboard");
     this.devices = new Devices();
@@ -76,6 +77,8 @@ export default class Dashboard {
 
     jsonCall.promise.then((result) => {
       this.setStatSelectMenu(result);
+      this.showCards();
+      this.spinner.off();
     }).catch((errorMessage) => {
       try {
         throw new Error(errorMessage);
@@ -87,6 +90,7 @@ export default class Dashboard {
   
   getLastMessage() {
     let jsonCall = Tools.getJSON(this.getLastMessageUrl);
+    this.spinner.on(jsonCall.reject);
 
     jsonCall.promise.then((result) => {
       this.setTemperaturePanel(result.response);
@@ -126,7 +130,7 @@ export default class Dashboard {
         console.log('Web Sockets On Message:');
         console.log(data);
         this._liveCallback = callback;
-        this._liveCallback(data);
+        this._liveCallback(data.response);
       } 
     };
 
@@ -139,7 +143,6 @@ export default class Dashboard {
     });
 
     d3.select(this.acStatusEl)
-        .classed('hidden', false)
         .select('.panel-body')
         .text(acResponse.dataGroup[0].data[0].toUpperCase());
 
@@ -152,9 +155,6 @@ export default class Dashboard {
     let tempResponse = responses.find((response) => {
       return response.device.id == 'temperature';
     });
-
-    d3.select(this.tempStatusEl)
-        .classed('hidden', false);
 
     for (let dataGroup of tempResponse.dataGroup) {
       d3.select(this.tempStatusEl)
@@ -171,9 +171,6 @@ export default class Dashboard {
     let avgResponse = result.response.find((response) => {
       return response.deviceField.id == deviceField; 
     });
-
-    d3.select(this.tempStatsEl)
-        .classed('hidden', false);
 
     d3.select(this.meanTempEl)
         .html(avgResponse.mean + '℉')
@@ -211,6 +208,19 @@ export default class Dashboard {
   onRoomChange(result) {
     let value = event.target.value;
     this.setStatsPanel(result, value);
+  }
+
+  showCards() {
+    d3.select(this.tempStatusEl)
+        .classed('hidden', false);
+
+    d3.select(this.acStatusEl)
+        .classed('hidden', false);
+
+    d3.select(this.tempStatsEl)
+        .classed('hidden', false);
+
+
   }
 
 }
