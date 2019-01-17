@@ -35,8 +35,10 @@ dependencies {
 }      
 
 task stage() {
-  dependsOn clean
+  dependsOn clean, war
 }
+
+war.mustRunAfter clean
 
 task copyToLib(type: Copy) {
 	into "$buildDir/server"
