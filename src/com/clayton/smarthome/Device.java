@@ -7,15 +7,6 @@ import com.google.common.collect.Sets;
 
 public enum Device implements Iterable<DeviceField> {
   
-  AC(
-      "AC",
-      "ac",
-      "22190f84bb0845e5a571ab17269f88a4",
-      "6519448711e0448db33b8b17565cebd9",
-      Sets.newHashSet(DeviceField.STATE),
-      "Date",
-      "Status"),
-  
   TEMPERATURE(
       "Temperature",
       "temperature",
