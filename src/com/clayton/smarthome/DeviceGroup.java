@@ -9,9 +9,8 @@ public enum DeviceGroup implements Iterable<Device>{
   TEMPERATURE(
       "Temperature Group",
       "temperatureGroup",
-      Sets.newHashSet(
-          Device.TEMPERATURE,
-          Device.AC));
+      Sets.<Device>newHashSet(
+          Device.TEMPERATURE));
  
   final String label;
   final String id;
